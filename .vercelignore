@@ -1,0 +1,9 @@
+rl-course
+fable-outputs
+.gstack
+*.pptx
+~$*.pptx
+samsung-satellite.md
+node_modules
+app/node_modules
+app/dist
