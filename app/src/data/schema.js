@@ -44,12 +44,33 @@ export const PARAM_BLOCKS = [
   },
 ];
 
-export const DERIVATIONS = [
-  "From C6:  $1.4B ÷ $20M  =  70 flights for the full constellation",
-  "From P1:  3,500 ÷ 70  =  ~50 satellites per flight  (P7)",
-  "From P6 ÷ P5:  $80M ÷ $2,000/kg  =  40,000 kg payload / flight;  ÷ 50  =  ~800 kg per satellite  (P4)",
-  "Cross-check:  800 kg × $2,000/kg + <$0.5M build  ≈  $2.1M delivered  × 3,500  ≈  $7.4B space capex — inside the $10–12B envelope (C1)  ✓",
-  "From P1 ÷ P8:  3,500 ÷ 5 yr  ≈  700/yr replenishment  (P9) — matches the memo's own 700–875 range  ✓",
+// The case itself — summarized from the memo (samsung-satellite.md), to ground
+// the reader before the schema. Every figure below is the memo's own.
+export const CASE = {
+  question: "Should Samsung proceed with launching a satellite-based broadband communications business similar to Starlink?",
+  paras: [
+    "Samsung is exploring a civilian satellite-broadband venture conceptually similar to Starlink: a constellation of ~3,500 low-Earth-orbit satellites serving Southeast Asia and the Middle East — regions where unmet broadband demand meets governments that prefer non-US-controlled infrastructure, a regulatory white space the incumbents cannot easily enter. The model is B2B wholesale, not consumer retail: joint ventures with local mobile operators, sovereignty-compliant in-country gateways, Samsung's own fabs driving terminal costs down, and NTN modems in the ~200M Galaxy devices shipped each year as a captive direct-to-device channel.",
+    "The tension is the venture in one line: the memo scores the opportunity 8/10 and Samsung's capability fit 4/10. The balance sheet and the fabs are real — but Samsung owns no launch vehicle (third-party launch runs $1,500–2,500/kg) and employs zero aerospace engineers against the 400 the venture needs.",
+  ],
+  stats: [
+    { v: "~3,500", k: "LEO satellites proposed" },
+    { v: "$53B", k: "global LEO market by 2030" },
+    { v: "$10–12B", k: "cumulative capex to breakeven" },
+    { v: "Y7–8", k: "claimed cash-flow breakeven" },
+    { v: "−$8.5B", k: "trough cash position @ Y5" },
+    { v: "8/10 vs 4/10", k: "opportunity vs capability fit" },
+    { v: "$1.5–2.5K/kg", k: "third-party launch cost" },
+    { v: "0 → 400", k: "aerospace engineers, have vs need" },
+  ],
+  verdict: "The memo's own recommendation: do not commit the full constellation build now. Spend $1.5–2.5M on an 18-month Phase-1 validation — binding block-buy launch pricing from non-US heavy-lift providers, and Letters of Intent from Tier-1 mobile operators.",
+};
+
+export const DERIVATION_STEPS = [
+  { n: 1, from: "C6 · the memo's own sensitivity test", calc: "$1.4B cash impact ÷ $20M per flight", result: "70 flights for the full constellation" },
+  { n: 2, from: "P1 · constellation size", calc: "3,500 satellites ÷ 70 flights", result: "~50 satellites per flight → P7" },
+  { n: 3, from: "P6 ÷ P5 · flight cost over launch rate", calc: "$80M ÷ $2,000/kg = 40,000 kg payload · ÷ 50 sats", result: "~800 kg per satellite → P4", note: "Starlink V2-mini class — a plausibility check the memo never states" },
+  { n: 4, check: true, calc: "800 kg × $2,000/kg + <$0.5M build ≈ $2.1M delivered · × 3,500", result: "≈ $7.4B space capex — inside the $10–12B envelope (C1)" },
+  { n: 5, check: true, calc: "3,500 satellites ÷ 5-year lifespan", result: "≈ 700/yr replenishment (P9) — matches the memo's own 700–875 range" },
 ];
 
 export const RISKS = [

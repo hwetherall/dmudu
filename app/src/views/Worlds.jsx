@@ -1,9 +1,107 @@
 import { useState, useMemo } from "react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, Legend, ResponsiveContainer } from "recharts";
 import { C, MONO, SERIF } from "../theme.js";
-import { PageHead } from "../components/ui.jsx";
+import { PageHead, Section, Note } from "../components/ui.jsx";
 import { P0, DEPLOY, REVENUE, run, metrics, verdictOf, runWorld } from "../engine.js";
-import { WORLDS } from "../data/worlds.js";
+import { WORLDS, AXES } from "../data/worlds.js";
+
+/* ── the 2×2 worlds matrix ────────────────────────────────────────────── */
+
+const QUAD_BLURB = {
+  W1: "A real premium, paid for at a top-of-range structural tax — the race run in slow motion.",
+  W2: "The plan's dream quadrant: the premium holds and launch commoditizes.",
+  W3: "Full tax, no premium — the thesis fails on both ends at once.",
+  W4: "Cheap launch for everyone, premium for no one. Capacity becomes a commodity.",
+};
+
+function AxisCard({ axis }) {
+  return (
+    <div className="rounded-lg p-3" style={{ background: C.paper, border: `1px solid ${C.line}` }}>
+      <div className="text-sm" style={{ fontFamily: SERIF, fontWeight: 700, color: C.navy }}>{axis.title}</div>
+      <div className="text-xs mt-0.5 mb-1.5" style={{ color: C.ink, lineHeight: 1.5 }}>{axis.question}</div>
+      <div className="flex flex-col gap-1 mb-1.5">
+        {Object.values(axis.poles).map(p => (
+          <div key={p.name} className="text-xs flex gap-1.5" style={{ color: C.muted, lineHeight: 1.5 }}>
+            <span className="px-1.5 rounded" style={{ fontFamily: MONO, fontWeight: 700, background: C.tint, color: C.navy, whiteSpace: "nowrap", height: "fit-content" }}>{p.name}</span>
+            <span>{p.desc}</span>
+          </div>
+        ))}
+      </div>
+      <div className="text-xs" style={{ fontFamily: MONO, fontSize: 10, color: C.muted }}>{axis.dials}</div>
+      <div className="text-xs mt-1.5 pt-1.5 italic" style={{ color: C.muted, lineHeight: 1.5, borderTop: `1px solid ${C.line}` }}>{axis.why}</div>
+    </div>
+  );
+}
+
+function Quadrant({ w, verdict, selected, onSelect }) {
+  const x = w.x;
+  return (
+    <button onClick={() => onSelect(w.id)} className="rounded-lg p-3 text-left flex flex-col gap-1" style={{
+      background: selected ? "rgba(232,163,61,0.10)" : C.card,
+      border: `2px solid ${selected ? C.amber : C.line}`,
+      cursor: "pointer", minWidth: 0,
+    }}>
+      <div className="flex items-center gap-2">
+        <span style={{ fontFamily: MONO, fontWeight: 700, color: C.navy }}>{w.id}</span>
+        <span className="text-sm" style={{ fontFamily: SERIF, fontWeight: 700, color: C.navy }}>{w.name.split(" · ")[1]}</span>
+        <span className="ml-auto px-1.5 py-0.5 rounded text-xs" style={{ fontFamily: MONO, fontWeight: 700, background: verdict.color, color: "#fff" }}>
+          {verdict.v}{verdict.boundary ? " ·b" : ""}
+        </span>
+      </div>
+      <div className="text-xs" style={{ color: C.muted, lineHeight: 1.5 }}>{QUAD_BLURB[w.id]}</div>
+      <div className="text-xs mt-auto" style={{ fontFamily: MONO, fontSize: 10, color: C.ink }}>
+        ${x.kg.toLocaleString()}/kg · co-inv {Math.round(x.coinvest * 100)}% · rev ×{x.mult.toFixed(2)}{x.dDelay ? " · +1 yr" : ""}
+      </div>
+    </button>
+  );
+}
+
+function WorldMatrix({ selected, onSelect }) {
+  const verdicts = useMemo(() => Object.fromEntries(
+    WORLDS.filter(w => w.id !== "BASE").map(w => [w.id, verdictOf(runWorld(w.x).m, C)])
+  ), []);
+  const byId = id => WORLDS.find(w => w.id === id);
+  const vert = { writingMode: "vertical-rl", transform: "rotate(180deg)" };
+  const colHead = { fontFamily: MONO, fontSize: 14, fontWeight: 700, color: C.navy, textAlign: "center", background: C.tint, borderRadius: 6, padding: "7px 4px", border: `1px solid ${C.line}` };
+  const rowHead = { ...vert, fontFamily: MONO, fontSize: 14, fontWeight: 700, color: C.navy, textAlign: "center", alignSelf: "stretch", background: C.tint, borderRadius: 6, padding: "4px 7px", border: `1px solid ${C.line}` };
+  const sub = { fontWeight: 400, fontSize: 11, color: C.muted };
+
+  return (
+    <div className="relative">
+      <div className="grid gap-1.5" style={{ gridTemplateColumns: "auto auto minmax(0,1fr) minmax(0,1fr)", gridTemplateRows: "auto auto 1fr 1fr" }}>
+        {/* row 1 — x-axis title */}
+        <div style={{ gridColumn: "1 / 3", gridRow: 1 }} />
+        <div className="text-center uppercase" style={{ gridColumn: "3 / 5", gridRow: 1, fontSize: 13, letterSpacing: "0.08em", color: C.navy, fontWeight: 700, paddingBottom: 2 }}>
+          demand for sovereign infrastructure →
+        </div>
+        {/* row 2 — column pole headers */}
+        <div style={{ gridColumn: "1 / 3", gridRow: 2 }} />
+        <div style={{ ...colHead, gridColumn: 3, gridRow: 2 }}>FRAGMENTED <span style={sub}>· premium holds</span></div>
+        <div style={{ ...colHead, gridColumn: 4, gridRow: 2 }}>NORMALIZED <span style={sub}>· premium collapses</span></div>
+        {/* col 1 — y-axis title */}
+        <div className="uppercase" style={{ ...vert, gridColumn: 1, gridRow: "3 / 5", fontSize: 13, letterSpacing: "0.08em", color: C.navy, fontWeight: 700, textAlign: "center", paddingRight: 2, alignSelf: "stretch" }}>
+          ← launch access
+        </div>
+        {/* rows 3–4 — pole headers + quadrants */}
+        <div style={{ ...rowHead, gridColumn: 2, gridRow: 3 }}>SCARCE <span style={sub}>· $2,400/kg</span></div>
+        <Quadrant w={byId("W1")} verdict={verdicts.W1} selected={selected === "W1"} onSelect={onSelect} />
+        <Quadrant w={byId("W3")} verdict={verdicts.W3} selected={selected === "W3"} onSelect={onSelect} />
+        <div style={{ ...rowHead, gridColumn: 2, gridRow: 4 }}>ABUNDANT <span style={sub}>· $1,200/kg</span></div>
+        <Quadrant w={byId("W2")} verdict={verdicts.W2} selected={selected === "W2"} onSelect={onSelect} />
+        <Quadrant w={byId("W4")} verdict={verdicts.W4} selected={selected === "W4"} onSelect={onSelect} />
+      </div>
+      <div className="absolute" style={{ left: "calc(50% + 28px)", top: "calc(50% + 38px)", transform: "translate(-50%, -50%)", zIndex: 2 }}>
+        <button onClick={() => onSelect("BASE")} className="px-2 py-1 rounded-full text-xs" style={{
+          fontFamily: MONO, fontWeight: 700, cursor: "pointer",
+          background: selected === "BASE" ? C.amber : C.navy, color: selected === "BASE" ? C.navy : "#fff",
+          border: `2px solid ${C.paper}`, boxShadow: "0 1px 4px rgba(26,34,56,0.35)", whiteSpace: "nowrap",
+        }}>
+          ◉ baseline
+        </button>
+      </div>
+    </div>
+  );
+}
 
 const fmtB = v => (Math.abs(v) < 0.005 ? "0.00" : v.toFixed(2));
 const fmtD = v => (Math.abs(v) < 0.005 ? "·" : (v > 0 ? "+" : "−") + Math.abs(v).toFixed(2));
@@ -84,6 +182,19 @@ export default function Worlds() {
         title="Samsung LEO cash engine, regraded per world"
         sub="Same ~200 lines, same levers — only the world changes. Every figure on this page is computed live in your browser by the engine ported line-for-line from model.py; nothing is pasted."
       />
+
+      <Section title="The two axes — and the four worlds they span">
+        <div className="grid gap-3 mb-3" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))" }}>
+          <AxisCard axis={AXES.demand} />
+          <AxisCard axis={AXES.launch} />
+        </div>
+        <WorldMatrix selected={worldId} onSelect={setWorldId} />
+        <Note>
+          Why these two, out of all the X-dials? They are the uncertainties the verdict provably turns on, no Phase-1 study can resolve either
+          (both are decided by other actors, over years), and both are observable early — license events and manifest prices — which is exactly what the
+          Pathway tab instruments. The remaining X-dials ride along inside each world's vector. Click a quadrant to run it.
+        </Note>
+      </Section>
 
       {/* ── world selector band ── */}
       <div style={{ background: C.navy }} className="px-4 py-3 rounded-lg mb-4 flex flex-wrap items-center justify-between gap-3">
@@ -196,7 +307,7 @@ export default function Worlds() {
         </div>
         <div className="text-xs mt-2 italic" style={{ color: C.muted }}>
           Trough year highlighted in the header. In Δ mode, green cells help the venture, red cells hurt it — the tint deepens with the size of the move.
-          Shows Samsung's plan-as-written (S1) regraded per world; the strategy alternatives live in the regret matrix tab.
+          Shows Samsung's plan-as-written (S1) regraded per world; the strategy alternatives live on the Strategies tab.
         </div>
       </div>
 

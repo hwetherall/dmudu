@@ -1,20 +1,28 @@
 import { useState, useEffect } from "react";
 import { C, MONO, SERIF } from "./theme.js";
 import Overview from "./views/Overview.jsx";
+import Uncertainty from "./views/Uncertainty.jsx";
+import Method from "./views/Method.jsx";
+import Grammar from "./views/Grammar.jsx";
 import Schema from "./views/Schema.jsx";
 import Calibration from "./views/Calibration.jsx";
 import Worlds from "./views/Worlds.jsx";
+import Strategies from "./views/Strategies.jsx";
 import Regret from "./views/Regret.jsx";
 import Pathway from "./views/Pathway.jsx";
 import Findings from "./views/Findings.jsx";
 
 const TABS = [
   { id: "overview", label: "Overview", View: Overview },
-  { id: "schema", label: "1 · Extract", View: Schema },
+  { id: "uncertainty", label: "Uncertainty", View: Uncertainty },
+  { id: "method", label: "Method", View: Method },
+  { id: "grammar", label: "Grammar", View: Grammar },
+  { id: "schema", label: "1 · Extract", View: Schema, divider: true },
   { id: "calibration", label: "2 · Calibrate", View: Calibration },
   { id: "worlds", label: "3–4 · Worlds", View: Worlds },
-  { id: "regret", label: "5 · Regret", View: Regret },
-  { id: "pathway", label: "6 · Pathway", View: Pathway },
+  { id: "strategies", label: "5 · Strategies", View: Strategies },
+  { id: "regret", label: "6 · Regret", View: Regret },
+  { id: "pathway", label: "7 · Pathway", View: Pathway },
   { id: "findings", label: "Findings", View: Findings },
 ];
 
@@ -52,9 +60,10 @@ export default function App() {
               Innovera · the worked example behind the Pedram pack · every number cited, derived, computed, or declared
             </div>
           </div>
-          <nav className="flex flex-wrap gap-1">
-            {TABS.map(t => (
-              <button key={t.id} onClick={() => setTab(t.id)}
+          <nav className="flex flex-wrap items-center gap-1">
+            {TABS.map(t => (<span key={t.id} className="flex items-center gap-1">
+              {t.divider && <span style={{ width: 1, height: 18, background: "rgba(202,220,252,0.35)", margin: "0 4px", display: "inline-block" }} />}
+              <button onClick={() => setTab(t.id)}
                 className="px-3 py-1.5 rounded text-xs"
                 style={{
                   fontFamily: MONO, cursor: "pointer",
@@ -65,7 +74,7 @@ export default function App() {
                 }}>
                 {t.label}
               </button>
-            ))}
+            </span>))}
           </nav>
         </div>
       </div>

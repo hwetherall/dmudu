@@ -85,7 +85,7 @@ function Primer() {
   );
 }
 
-export default function Regret() {
+export default function Regret({ go }) {
   const [view, setView] = useState("npv"); // 'npv' | 'regret'
   const minimax = minimaxStrategy();
   const isRegret = view === "regret";
@@ -93,13 +93,31 @@ export default function Regret() {
   return (
     <div>
       <PageHead
-        kicker="Step 5 · The matrix — regret, computed"
+        kicker="Step 6 · The matrix — regret, computed"
         title="Five structurally distinct strategies × four worlds"
-        sub="NPV at the 11% corporate hurdle, $B. Diversity by construction: the candidates span build-it-all, shrink-it, change-the-product, sell-shovels, and walk-away — not four variations of the memo. Toggle to Regret to see each cell as the bill for being wrong; the regret figures are computed live from the NPV grid, not stored."
+        sub="The five strategies from the previous tab meet the four worlds. NPV at the 11% corporate hurdle, $B. Toggle to Regret to see each cell as the bill for being wrong; the regret figures are computed live from the NPV grid, not stored."
       />
 
       <PlanGradedTable />
       <Primer />
+
+      <Section title="The rows — a reminder of who's who">
+        <div className="flex flex-wrap items-center gap-2">
+          {STRATEGIES.map(s => (
+            <button key={s.id} onClick={() => go("strategies")} className="rounded px-2.5 py-1.5 text-left" style={{
+              background: C.paper, cursor: "pointer",
+              border: `1px solid ${s.id === minimax ? C.good : s.id === "S1" ? C.bad : C.line}`,
+            }}>
+              <span style={{ fontFamily: MONO, fontWeight: 700, color: C.navy, fontSize: 12 }}>{s.id}</span>
+              <span className="ml-1.5 text-xs" style={{ fontWeight: 600, color: C.ink }}>{s.name}</span>
+              <span className="ml-1.5 text-xs italic" style={{ color: C.amber, fontWeight: 700 }}>{s.archetype}</span>
+            </button>
+          ))}
+          <button onClick={() => go("strategies")} className="px-2.5 py-1.5 rounded text-xs" style={{ fontFamily: MONO, fontWeight: 700, background: C.navy, color: "#fff", border: "none", cursor: "pointer" }}>
+            full detail — the Strategies tab →
+          </button>
+        </div>
+      </Section>
 
       <Section
         title="The grid"
@@ -179,22 +197,6 @@ export default function Regret() {
           everywhere else. The risk-return asymmetry is brutal once it's a number.
         </p>
       </div>
-
-      <Section title="The five candidates — diversity enforced by construction">
-        <div className="grid gap-3" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}>
-          {STRATEGIES.map(s => (
-            <div key={s.id} className="rounded-lg p-3" style={{ background: C.paper, border: `1px solid ${s.id === minimax ? C.good : s.id === "S1" ? C.bad : C.line}` }}>
-              <div className="flex items-baseline gap-2 mb-1">
-                <span style={{ fontFamily: MONO, fontWeight: 700, color: C.navy }}>{s.id}</span>
-                <span className="text-sm" style={{ fontFamily: SERIF, fontWeight: 700, color: C.navy }}>{s.name}</span>
-                <span className="ml-auto text-xs italic" style={{ color: C.amber, fontWeight: 700 }}>{s.archetype}</span>
-              </div>
-              <div className="text-xs" style={{ color: C.muted, lineHeight: 1.55 }}>{s.desc}</div>
-              <div className="text-xs mt-1.5" style={{ fontFamily: MONO, color: C.muted }}>provenance: {s.provenance}</div>
-            </div>
-          ))}
-        </div>
-      </Section>
 
       <Section title="Caveats — carried openly, because without them this is confabulation with arithmetic">
         <ul className="text-sm pl-5" style={{ color: C.ink, lineHeight: 1.7, listStyle: "disc", maxWidth: 920 }}>

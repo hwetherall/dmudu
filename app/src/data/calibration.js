@@ -14,9 +14,16 @@ export const ANCHORS = [
 
 export const FINDINGS = [
   {
-    n: 1, title: "The memo's anchors are mutually inconsistent — the mechanism is the replenishment wall",
-    body: "With cited values (5-yr lifespan), the Y4–5 build cohorts (~2,950 satellites) fall due for replacement in Y9–10 at ~$6.2B — exactly when the memo expects cumulative breakeven consolidation. Five of six financial anchors cohere around a Year 9–12 breakeven; the Year 7–8 claim (C2) is the orphan.",
-    detail: "Inversion — what Year 7–8 breakeven requires: a 7-yr satellite lifespan (contradicting the memo's own 4–5), ~50% cash margins from Y6, and $10B revenue by Y8. That variant yields IRR 26% — which the memo's stated 11–13% contradicts. Conclusion: the memo's financial claims were emitted by at least two mutually inconsistent implicit models. The IRR/margin/trough cluster is the credible one.",
+    n: 1, title: "The memo's numbers cannot all be true at once — and Year 7–8 breakeven is the odd one out",
+    body: "This is the star result of the whole exercise, and it takes five sentences. No judgment is involved at any step — only the memo's own cited values, run through arithmetic.",
+    steps: [
+      "The memo says satellites last 5 years (P8). Take it at its word.",
+      "The memo's build schedule puts ~2,950 satellites — 84% of the constellation — into orbit during Years 4–5.",
+      "Five years later, in Years 9–10, every one of those satellites dies and must be replaced. The bill: ~$6.2B.",
+      "That bill lands exactly inside the window where the memo claims cumulative breakeven (Year 7–8). You cannot cross zero while paying to rebuild five-sixths of your fleet.",
+      "Run on the memo's own cited values, the model breaks even in Year 12 — and the memo's other five anchors (capital, trough, IRR, margin, Y10 revenue) all agree with Year 12, not with Year 7–8. The Year 7–8 claim is the orphan.",
+    ],
+    detail: "Cross-examination — what would Year 7–8 breakeven require? A 7-year satellite lifespan (the memo itself says 4–5), roughly 50% cash margins from Year 6, and $10B of revenue by Year 8. That variant of the venture would earn an IRR of 26% — which the memo's own stated 11–13% flatly contradicts. Conclusion: the memo's financial claims were emitted by at least two mutually inconsistent implicit models. The IRR / margin / trough cluster is the internally consistent one; the breakeven headline is not. Upstream consequence: financial claims should be emitted from one coherent model — which is precisely what this step builds.",
   },
   {
     n: 2, title: "Launch elasticity reproduces exactly",

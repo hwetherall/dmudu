@@ -6,7 +6,7 @@ export default function Pathway() {
   return (
     <div>
       <PageHead
-        kicker="Step 6 · The pathway — the matrix becomes a policy"
+        kicker="Step 7 · The pathway — the matrix becomes a policy"
         title="Signposts, triggers, staged commitment"
         sub="The robustness matrix does not say “do GaaS.” It says: the plan-as-written is a wager on W2, and the rational structure is a staged policy that buys world-information cheaply before committing capital irreversibly. The memo's own Phase 1 is that purchase."
       />

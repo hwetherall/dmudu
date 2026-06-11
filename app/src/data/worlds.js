@@ -1,3 +1,28 @@
+// The two deep-uncertain axes that span the worlds. Each axis is a bundle of
+// X-dials collapsed to two poles; 2 × 2 = the four worlds below.
+export const AXES = {
+  demand: {
+    title: "Demand for sovereign infrastructure",
+    question: "Does the preference for non-US-controlled infrastructure stay hard — or normalize away?",
+    dials: "moves P19 (sovereignty premium, THE thesis parameter), P11 (MNO co-invest), revenue multiplier",
+    poles: {
+      fragmented: { name: "Fragmented", desc: "Mandates harden; the premium is real; MNOs co-invest at 60%" },
+      normalized: { name: "Normalized", desc: "Incumbents concede compliance and get licensed; premium collapses; co-invest falls to 25%" },
+    },
+    why: "R2 calls the premium's absence the thesis killer. No study resolves this — it is decided over years by governments, elections, and incumbents' concessions.",
+  },
+  launch: {
+    title: "Launch access",
+    question: "Does non-SpaceX heavy-lift capacity stay scarce — or commoditize?",
+    dials: "moves P5 (launch $/kg, the single most load-bearing parameter), deployment & revenue delays",
+    poles: {
+      scarce: { name: "Scarce", desc: "85% of non-US/non-Chinese capacity booked through 2029; $2,400/kg; +1 yr in the manifest queue" },
+      abundant: { name: "Abundant", desc: "New Glenn, Neutron and ISRO scale; launch clears at $1,200/kg with no queue" },
+    },
+    why: "A $20M move per flight is a $1.4B cash swing (C6). Whether rival launch programs scale is decided in other companies' factories, on their timetable.",
+  },
+};
+
 // The four worlds as X-vectors + curated narration. Worlds touch only
 // exogenous dials; the plan's levers are untouched (XLRM discipline).
 export const WORLDS = [
