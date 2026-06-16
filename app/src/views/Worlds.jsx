@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, Legend, ResponsiveContainer } from "recharts";
 import { C, MONO, SERIF } from "../theme.js";
 import { PageHead, Section, Note } from "../components/ui.jsx";
@@ -13,6 +13,55 @@ const QUAD_BLURB = {
   W3: "Full tax, no premium — the thesis fails on both ends at once.",
   W4: "Cheap launch for everyone, premium for no one. Capacity becomes a commodity.",
 };
+
+// One talk-over line per world for the present-mode beats — distilled from each world's verdictNote.
+const WORLD_SUPPORT = {
+  W1: "IRR lands on the 5% boundary — reported as a boundary, not nudged. What it asks for: a smaller, slower constellation.",
+  W2: "The one world where the plan as written is the right answer. As written, the plan is a wager on this quadrant.",
+  W3: "−$12.4B, the deepest hole on the board — but it dies detectably: a license event, years before the cash proves it.",
+  W4: "Same verdict as W3, opposite shape — a slow margin bleed. The response isn't a better constellation; it's not being one.",
+};
+
+/* ── present-mode scaffolding (mirrors the Uncertainty page) ──────────────── */
+
+const PBEAT_BIG = { fontFamily: SERIF, fontWeight: 700, color: C.navy, fontSize: "clamp(30px,4.6vw,58px)", lineHeight: 1.14, letterSpacing: "-0.01em", margin: 0 };
+const PBEAT_SUB = { fontFamily: SERIF, color: C.muted, fontSize: "clamp(17px,2.05vw,24px)", lineHeight: 1.55, margin: 0 };
+const PBEAT_KICK = { fontFamily: MONO, fontWeight: 700, fontSize: "clamp(12px,1.15vw,15px)", textTransform: "uppercase", letterSpacing: 2, color: C.amber };
+const PBTN_NAVY = { fontFamily: MONO, fontWeight: 700, fontSize: "clamp(14px,1.5vw,18px)", background: C.navy, color: "#fff", border: "none", borderRadius: 8, padding: "14px 26px", cursor: "pointer" };
+const PBTN_GHOST = { ...PBTN_NAVY, background: C.paper, color: C.navy, border: `1px solid ${C.line}` };
+
+const PRESENT_CSS = `
+@keyframes wldBeatIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+.present-beat { animation: wldBeatIn 170ms ease-out; }
+@media print { .present-overlay, .wld-mode-toggle { display: none !important; } }
+`;
+
+function ModeToggle({ isPresent, onRead, onPresent }) {
+  const base = { fontFamily: MONO, fontWeight: 700, fontSize: 12, padding: "6px 16px", border: "none", cursor: "pointer", lineHeight: 1.4 };
+  return (
+    <div
+      className="wld-mode-toggle"
+      onClick={(e) => e.stopPropagation()}
+      style={{ display: "inline-flex", borderRadius: 999, overflow: "hidden", border: `1px solid ${C.line}`, background: C.paper }}
+    >
+      <button onClick={(e) => { e.currentTarget.blur(); onRead(); }} style={{ ...base, background: isPresent ? C.paper : C.navy, color: isPresent ? C.muted : "#fff" }}>Read</button>
+      <button onClick={(e) => { e.currentTarget.blur(); onPresent(); }} style={{ ...base, background: isPresent ? C.navy : C.paper, color: isPresent ? "#fff" : C.muted }}>Present</button>
+    </div>
+  );
+}
+
+// A large verdict pill, colored live by the engine's THRIVE/REWORK/DIE call.
+function VerdictPill({ verdict, big }) {
+  return (
+    <span style={{
+      display: "inline-block", fontFamily: MONO, fontWeight: 700, letterSpacing: 1,
+      fontSize: big ? "clamp(14px,1.5vw,18px)" : "clamp(11px,1.1vw,13px)",
+      background: verdict.color, color: "#fff", padding: big ? "8px 18px" : "3px 9px", borderRadius: big ? 8 : 5,
+    }}>
+      {verdict.v}{verdict.boundary ? (big ? " · boundary" : " ·b") : ""}
+    </span>
+  );
+}
 
 function AxisCard({ axis }) {
   return (
@@ -134,12 +183,140 @@ function DialChip({ label, base, now, fmt }) {
   );
 }
 
-export default function Worlds() {
+export default function Worlds({ go }) {
   const [worldId, setWorldId] = useState("W3");
   const [mode, setMode] = useState("values"); // 'values' | 'delta'
+  const [isPresent, setIsPresent] = useState(false);
+  const [beatIndex, setBeatIndex] = useState(0);
 
   const baseRows = useMemo(() => run(P0, DEPLOY, REVENUE, 0), []);
   const baseM = useMemo(() => metrics(baseRows), [baseRows]);
+
+  // Live verdicts for all four worlds (same call the matrix uses) — drives the present beats.
+  const verdicts = useMemo(() => Object.fromEntries(
+    WORLDS.filter(w => w.id !== "BASE").map(w => [w.id, verdictOf(runWorld(w.x).m, C)])
+  ), []);
+  const worldsList = useMemo(() => WORLDS.filter(w => w.id !== "BASE"), []);
+
+  const enterPresent = () => { setBeatIndex(0); setIsPresent(true); };
+  const exitPresent = () => setIsPresent(false);
+
+  // ── present-mode beat sequence: why we build worlds, then the four worlds ──
+  const beats = [
+    // 1 · Hook — why bound, not forecast
+    (
+      <div style={{ textAlign: "center" }}>
+        <div style={PBEAT_BIG}>Past the wall, you can't forecast. So you bound the future instead.</div>
+        <p style={{ ...PBEAT_SUB, maxWidth: 880, margin: "30px auto 0" }}>
+          Level 3 hands you a few plausible futures and no honest odds. The move isn't to predict which one arrives —{" "}
+          <span style={{ color: C.navy, fontWeight: 700 }}>it's to find the decision that survives all of them.</span>
+        </p>
+      </div>
+    ),
+    // 2 · The two axes the verdict turns on
+    (
+      <div>
+        <div style={{ ...PBEAT_KICK, textAlign: "center", marginBottom: 30 }}>the two questions the verdict turns on</div>
+        <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
+          {[AXES.demand, AXES.launch].map((axis) => (
+            <div key={axis.title} style={{ flex: 1, minWidth: 280, background: C.card, border: `1px solid ${C.line}`, borderRadius: 12, padding: "clamp(20px,2.4vw,34px)" }}>
+              <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(20px,2.2vw,28px)", color: C.navy, lineHeight: 1.2 }}>{axis.title}</div>
+              <div style={{ fontFamily: SERIF, fontSize: "clamp(15px,1.6vw,20px)", color: C.muted, lineHeight: 1.5, marginTop: 12 }}>{axis.question}</div>
+              <div style={{ display: "flex", gap: 10, marginTop: 22, flexWrap: "wrap" }}>
+                {Object.values(axis.poles).map((p) => (
+                  <span key={p.name} style={{ fontFamily: MONO, fontWeight: 700, fontSize: "clamp(12px,1.2vw,15px)", background: C.tint, color: C.navy, border: `1px solid ${C.line}`, padding: "7px 14px", borderRadius: 6 }}>{p.name}</span>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+        <p style={{ ...PBEAT_SUB, fontSize: "clamp(15px,1.7vw,20px)", textAlign: "center", maxWidth: 940, margin: "30px auto 0" }}>
+          Of every unknown in the memo, only these two: no Phase-1 study resolves them, both are decided by other actors over years, and both surface early — license events and manifest prices.
+        </p>
+      </div>
+    ),
+    // 3 · Cross them → four worlds (2×2 at a glance)
+    (
+      <div>
+        <div style={{ ...PBEAT_KICK, textAlign: "center", marginBottom: 26 }}>two axes, two poles each</div>
+        <div style={{ display: "grid", gridTemplateColumns: "auto 1fr 1fr", gridTemplateRows: "auto 1fr 1fr", gap: 12 }}>
+          <div />
+          <div style={{ textAlign: "center", fontFamily: MONO, fontWeight: 700, fontSize: "clamp(12px,1.2vw,15px)", color: C.navy }}>FRAGMENTED<div style={{ fontWeight: 400, fontSize: 11, color: C.muted }}>premium holds</div></div>
+          <div style={{ textAlign: "center", fontFamily: MONO, fontWeight: 700, fontSize: "clamp(12px,1.2vw,15px)", color: C.navy }}>NORMALIZED<div style={{ fontWeight: 400, fontSize: 11, color: C.muted }}>premium collapses</div></div>
+          {[
+            { row: "SCARCE", sub: "$2,400/kg", ids: ["W1", "W3"] },
+            { row: "ABUNDANT", sub: "$1,200/kg", ids: ["W2", "W4"] },
+          ].map((r) => [
+            <div key={r.row} style={{ display: "flex", flexDirection: "column", justifyContent: "center", fontFamily: MONO, fontWeight: 700, fontSize: "clamp(12px,1.2vw,15px)", color: C.navy }}>{r.row}<span style={{ fontWeight: 400, fontSize: 11, color: C.muted }}>{r.sub}</span></div>,
+            ...r.ids.map((id) => {
+              const w = worldsList.find((x) => x.id === id);
+              const v = verdicts[id];
+              return (
+                <div key={id} style={{ background: C.card, border: `1px solid ${C.line}`, borderLeft: `5px solid ${v.color}`, borderRadius: 10, padding: "clamp(12px,1.5vw,20px)", display: "flex", flexDirection: "column", gap: 6 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
+                    <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: "clamp(13px,1.3vw,17px)", color: C.navy }}>{id}</span>
+                    <span style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(14px,1.5vw,20px)", color: C.navy }}>{w.name.split(" · ")[1]}</span>
+                    <span style={{ marginLeft: "auto" }}><VerdictPill verdict={v} /></span>
+                  </div>
+                </div>
+              );
+            }),
+          ])}
+        </div>
+        <p style={{ ...PBEAT_SUB, fontSize: "clamp(16px,1.9vw,24px)", color: C.navy, textAlign: "center", maxWidth: 960, margin: "30px auto 0" }}>
+          Four futures. The plan must survive all four — or we instrument the ones it doesn't.
+        </p>
+      </div>
+    ),
+    // 4–7 · the four worlds, one beat each — the full description, then the takeaway
+    ...worldsList.map((w) => (
+      <div style={{ textAlign: "center" }}>
+        <div style={{ ...PBEAT_KICK, color: verdicts[w.id].color, marginBottom: 18 }}>{w.tag}</div>
+        <div style={{ ...PBEAT_BIG, fontSize: "clamp(30px,4vw,52px)" }}>{w.name}</div>
+        <div style={{ marginTop: 22 }}><VerdictPill verdict={verdicts[w.id]} big /></div>
+        <p style={{ ...PBEAT_SUB, fontSize: "clamp(17px,1.95vw,24px)", color: C.ink, maxWidth: 940, margin: "30px auto 0" }}>{w.story}</p>
+        <p style={{ ...PBEAT_SUB, fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(15px,1.7vw,21px)", color: C.navy, maxWidth: 820, margin: "26px auto 0", paddingTop: 24, borderTop: `1px solid ${C.line}` }}>{WORLD_SUPPORT[w.id]}</p>
+      </div>
+    )),
+    // 8 · Close / handoff
+    (
+      <div style={{ textAlign: "center" }}>
+        <div style={{ ...PBEAT_BIG, maxWidth: 1000, marginLeft: "auto", marginRight: "auto" }}>Four futures, one engine — every cell computed live.</div>
+        <p style={{ ...PBEAT_SUB, maxWidth: 820, margin: "26px auto 0" }}>
+          Pick a world and watch the same plan regrade. Then see how four verdicts become one decision.
+        </p>
+        <div style={{ display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap", marginTop: 40 }}>
+          <button onClick={(e) => { e.stopPropagation(); exitPresent(); }} style={PBTN_NAVY}>explore the worlds →</button>
+          <button onClick={(e) => { e.stopPropagation(); go("strategies"); }} style={PBTN_GHOST}>the strategies →</button>
+          <button onClick={(e) => { e.stopPropagation(); go("regret"); }} style={PBTN_GHOST}>the regret table →</button>
+        </div>
+      </div>
+    ),
+  ];
+
+  const beatCount = beats.length;
+
+  useEffect(() => {
+    if (!isPresent) return;
+    function onKey(e) {
+      if (e.key === "Escape") { setIsPresent(false); return; }
+      if (e.key === "ArrowRight" || e.key === " " || e.key === "Spacebar") {
+        e.preventDefault();
+        setBeatIndex((i) => Math.min(i + 1, beatCount - 1));
+      } else if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        setBeatIndex((i) => Math.max(i - 1, 0));
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [isPresent, beatCount]);
+
+  function handleZoneClick(e) {
+    const x = e.clientX / window.innerWidth;
+    if (x >= 0.4) setBeatIndex((i) => Math.min(i + 1, beatCount - 1));
+    else if (x <= 0.2) setBeatIndex((i) => Math.max(i - 1, 0));
+  }
 
   const world = WORLDS.find(w => w.id === worldId);
   const { rows, m } = useMemo(() => runWorld(world.x), [worldId]);
@@ -177,8 +354,14 @@ export default function Worlds() {
 
   return (
     <div>
+      <style>{PRESENT_CSS}</style>
+
+      <div className="flex justify-end mb-3">
+        <ModeToggle isPresent={isPresent} onRead={exitPresent} onPresent={enterPresent} />
+      </div>
+
       <PageHead
-        kicker="Steps 3–4 · Worlds & verdicts — the model, literally"
+        kicker="Step 4 · Worlds & verdicts — the model, literally"
         title="Samsung LEO cash engine, regraded per world"
         sub="Same ~200 lines, same levers — only the world changes. Every figure on this page is computed live in your browser by the engine ported line-for-line from model.py; nothing is pasted."
       />
@@ -342,6 +525,53 @@ export default function Worlds() {
           <b style={{ color: "#fff" }}>Verdict: </b>{world.verdictNote}
         </p>
       </div>
+
+      {/* ── Present-mode overlay — why we build worlds, then the four worlds ── */}
+      {isPresent && (
+        <div
+          className="present-overlay"
+          onClick={handleZoneClick}
+          style={{ position: "fixed", inset: 0, zIndex: 9000, background: C.paper, overflow: "hidden", userSelect: "none", cursor: "default" }}
+        >
+          <div style={{ position: "absolute", top: 20, left: 26, zIndex: 3, fontFamily: MONO, fontSize: 12, fontWeight: 700, color: C.muted, letterSpacing: 0.5 }}>
+            Samsung LEO · Worlds
+          </div>
+          <div style={{ position: "absolute", top: 16, right: 20, zIndex: 3 }}>
+            <ModeToggle isPresent={isPresent} onRead={exitPresent} onPresent={enterPresent} />
+          </div>
+
+          <div
+            key={beatIndex}
+            className="present-beat"
+            style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", padding: "78px clamp(24px,5vw,96px) 96px", boxSizing: "border-box" }}
+          >
+            <div style={{ width: "100%", maxWidth: 1120 }}>{beats[beatIndex]}</div>
+          </div>
+
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{ position: "absolute", bottom: 24, left: 0, right: 0, zIndex: 3, display: "flex", justifyContent: "center", gap: 10 }}
+          >
+            {beats.map((_, i) => {
+              const current = i === beatIndex;
+              const seen = i < beatIndex;
+              const size = current ? 13 : 9;
+              return (
+                <button
+                  key={i}
+                  onClick={() => setBeatIndex(i)}
+                  aria-label={`Go to beat ${i + 1}`}
+                  style={{
+                    width: size, height: size, padding: 0, borderRadius: 999, cursor: "pointer",
+                    background: current ? C.amber : seen ? C.navy : "transparent",
+                    border: `1px solid ${current ? C.amber : seen ? C.navy : C.line}`,
+                  }}
+                />
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

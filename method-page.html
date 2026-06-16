@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Method — Samsung LEO · Deep Uncertainty Workbench</title>
+  <style>
+    :root {
+      --navy: #1A2238;
+      --ink: #232A40;
+      --paper: #F7F9FC;
+      --card: #FFFFFF;
+      --ice: #CADCFC;
+      --amber: #E8A33D;
+      --good: #2E7D5B;
+      --bad: #B23A48;
+      --mid: #8A6D1F;
+      --muted: #5A6478;
+      --line: #D7DEEA;
+      --tint: #E9EEF7;
+      --mono: ui-monospace, Menlo, Consolas, monospace;
+      --serif: Georgia, Cambria, serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .wrap { max-width: 1040px; margin: 0 auto; padding: 40px 24px 64px; }
+
+    .app-head { border-bottom: 1px solid var(--line); padding-bottom: 16px; margin-bottom: 28px; }
+    .app-title { font-family: var(--serif); font-weight: 700; color: var(--navy); font-size: 22px; line-height: 1.2; }
+    .app-sub { font-family: var(--mono); color: var(--muted); font-size: 12px; margin-top: 6px; }
+
+    .kicker { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--amber); font-weight: 700; margin-bottom: 6px; }
+    .page-title { font-family: var(--serif); color: var(--navy); font-weight: 700; font-size: 28px; line-height: 1.2; }
+    .page-sub { font-size: 14px; margin-top: 8px; color: var(--muted); max-width: 880px; line-height: 1.55; }
+
+    .section { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 20px; margin-bottom: 16px; }
+    .section-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+    .section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 700; }
+
+    .note { font-size: 12px; margin-top: 12px; font-style: italic; color: var(--muted); line-height: 1.5; }
+
+    /* pipeline at a glance */
+    .pipeline { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+    .pipe-step { display: flex; align-items: center; gap: 6px; }
+    .pipe-btn { font-family: var(--mono); font-weight: 700; font-size: 12px; background: var(--navy); color: #fff; border-radius: 4px; padding: 6px 10px; text-decoration: none; display: inline-block; }
+    .pipe-sep { color: var(--amber); font-weight: 700; }
+    .pipe-loop-label { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+
+    /* step in/out */
+    .io-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; align-items: center; }
+    .io-pill { font-family: var(--mono); font-size: 12px; background: var(--tint); color: var(--navy); border-radius: 4px; padding: 5px 8px; }
+    .step-what { font-size: 14px; margin-bottom: 10px; color: var(--ink); line-height: 1.65; max-width: 920px; }
+    .step-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 10px; }
+    .step-box { font-size: 12px; border-radius: 6px; padding: 10px; color: var(--ink); line-height: 1.6; }
+    .label-rule { font-family: var(--mono); font-weight: 700; color: var(--bad); }
+    .label-why { font-family: var(--mono); font-weight: 700; color: var(--navy); }
+
+    .open-tab {
+      font-family: var(--mono); font-weight: 700; font-size: 12px;
+      background: var(--amber); color: var(--navy);
+      border-radius: 4px; padding: 5px 10px; text-decoration: none; display: inline-block;
+    }
+
+    @media print { body { background: #fff; } .wrap { padding: 0; max-width: none; } .section { break-inside: avoid; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="app-head">
+      <div class="app-title">Samsung LEO · Deep Uncertainty Workbench</div>
+      <div class="app-sub">Innovera · the worked example behind the Pedram pack · every number cited, derived, computed, or declared</div>
+    </header>
+
+    <!-- PageHead -->
+    <div style="margin-bottom: 24px;">
+      <div class="kicker">The method — seven steps, run by hand</div>
+      <div class="page-title">Predict-then-act becomes explore-then-adapt</div>
+      <div class="page-sub">Past the level-2/3 wall, the question changes from 'what will happen?' to 'which decision survives?'. The seven steps below answer it. Each one is a tab in this app — the numbers on those tabs are the actual output of running the method on the Samsung memo.</div>
+    </div>
+
+    <!-- Pipeline at a glance -->
+    <section class="section">
+      <div class="section-head"><div class="section-title">The pipeline at a glance</div></div>
+      <div class="pipeline">
+        <span class="pipe-step"><a class="pipe-btn" href="#schema">1 · Extract</a><span class="pipe-sep">→</span></span>
+        <span class="pipe-step"><a class="pipe-btn" href="#calibration">2 · Calibrate</a><span class="pipe-sep">→</span></span>
+        <span class="pipe-step"><a class="pipe-btn" href="#worlds">3 · Worlds</a><span class="pipe-sep">→</span></span>
+        <span class="pipe-step"><a class="pipe-btn" href="#worlds">4 · Verdicts</a><span class="pipe-sep">→</span></span>
+        <span class="pipe-step"><a class="pipe-btn" href="#strategies">5 · Strategies</a><span class="pipe-sep">→</span></span>
+        <span class="pipe-step"><a class="pipe-btn" href="#regret">6 · Matrix + Regret</a><span class="pipe-sep">→</span></span>
+        <span class="pipe-step"><a class="pipe-btn" href="#pathway">7 · Pathway</a></span>
+        <span class="pipe-sep">↻</span>
+        <span class="pipe-loop-label">re-instantiate as the world reveals itself</span>
+      </div>
+      <div class="note">Steps 1–2 build trust (the model must earn the right to be used). Steps 3–6 spend that trust (futures, verdicts, strategies, regret). Step 7 turns the analysis into something that lives past the meeting.</div>
+    </section>
+
+    <!-- Step 1 -->
+    <section class="section">
+      <div class="section-head"><div class="section-title">Step 1 · Extract</div><a class="open-tab" href="#schema">open the tab →</a></div>
+      <div class="io-row">
+        <span class="io-pill"><b>in:</b> the memo — 40 pages of prose</span>
+        <span class="pipe-sep">→</span>
+        <span class="io-pill"><b>out:</b> a cited parameter schema: 24 parameters, 12 risks, 9 calibration targets, 7 flags</span>
+      </div>
+      <p class="step-what">Every quantitative claim in the memo is pulled out, given an ID, cited to the section it came from, and tagged: X (the world decides it), L (Samsung decides it), D (derived — it recomputes), or GAP (required but absent — declared, never silently filled).</p>
+      <div class="step-cols">
+        <div class="step-box" style="background: var(--paper); border: 1px solid var(--line);"><span class="label-rule">THE RULE · </span>Nothing enters the model without a citation, a derivation, or a declared assumption.</div>
+        <div class="step-box" style="background: var(--tint); border-left: 3px solid var(--amber);"><span class="label-why">WHY IT MATTERS · </span>Extraction doubles as an audit: forcing prose into a schema surfaced two genuine incoherences in the memo (F4, F7) before any modeling began.</div>
+      </div>
+    </section>
+
+    <!-- Step 2 -->
+    <section class="section">
+      <div class="section-head"><div class="section-title">Step 2 · Calibrate</div><a class="open-tab" href="#calibration">open the tab →</a></div>
+      <div class="io-row">
+        <span class="io-pill"><b>in:</b> the schema + a ~200-line annual cash engine</span>
+        <span class="pipe-sep">→</span>
+        <span class="io-pill"><b>out:</b> a baseline the model has earned the right to use</span>
+      </div>
+      <p class="step-what">The memo's own stated outcomes — breakeven year, cash trough, IRR, margins, Year-10 revenue — become a test suite. The model must reproduce them before computing anything new. Two anchors were held out as pure tests, not fitting targets.</p>
+      <div class="step-cols">
+        <div class="step-box" style="background: var(--paper); border: 1px solid var(--line);"><span class="label-rule">THE RULE · </span>No deviation is computed until the baseline reproduces the memo.</div>
+        <div class="step-box" style="background: var(--tint); border-left: 3px solid var(--amber);"><span class="label-why">WHY IT MATTERS · </span>Six of seven anchors hit. The seventh broke — and the breakage is not a bug, it is the memo contradicting itself. That failure is Finding 1, the strongest result in the whole exercise.</div>
+      </div>
+    </section>
+
+    <!-- Step 3 -->
+    <section class="section">
+      <div class="section-head"><div class="section-title">Step 3 · Worlds</div><a class="open-tab" href="#worlds">open the tab →</a></div>
+      <div class="io-row">
+        <span class="io-pill"><b>in:</b> the deep-uncertain X parameters</span>
+        <span class="pipe-sep">→</span>
+        <span class="io-pill"><b>out:</b> four worlds — each a pure exogenous parameter vector</span>
+      </div>
+      <p class="step-what">Two axes that no study can resolve — does sovereignty demand stay fragmented or normalize? does launch access stay scarce or become abundant? — cross into four plausible futures. Each world is written down as nothing but X-parameter values: launch $/kg, co-invest share, revenue multiplier, delays.</p>
+      <div class="step-cols">
+        <div class="step-box" style="background: var(--paper); border: 1px solid var(--line);"><span class="label-rule">THE RULE · </span>Worlds may touch only X. A world that wants to change a lever is rejected by the schema.</div>
+        <div class="step-box" style="background: var(--tint); border-left: 3px solid var(--amber);"><span class="label-why">WHY IT MATTERS · </span>The futures stop being narratives and become inputs — something a model can actually run.</div>
+      </div>
+    </section>
+
+    <!-- Step 4 -->
+    <section class="section">
+      <div class="section-head"><div class="section-title">Step 4 · Verdicts</div><a class="open-tab" href="#worlds">open the tab →</a></div>
+      <div class="io-row">
+        <span class="io-pill"><b>in:</b> each world × the plan as written</span>
+        <span class="pipe-sep">→</span>
+        <span class="io-pill"><b>out:</b> THRIVE / REWORK / DIE per world</span>
+      </div>
+      <p class="step-what">The baseline plan runs through the engine under each world's X-vector. The verdict rule — IRR and breakeven thresholds — was fixed ex ante, before any world ran, so outcomes cannot be retro-fitted to a preferred story.</p>
+      <div class="step-cols">
+        <div class="step-box" style="background: var(--paper); border: 1px solid var(--line);"><span class="label-rule">THE RULE · </span>The verdict rule is frozen before the first world runs.</div>
+        <div class="step-box" style="background: var(--tint); border-left: 3px solid var(--amber);"><span class="label-why">WHY IT MATTERS · </span>Boundary cases get reported as boundaries (W1 lands at IRR 4.8% against a 5% cutoff) — not nudged to either side.</div>
+      </div>
+    </section>
+
+    <!-- Step 5 -->
+    <section class="section">
+      <div class="section-head"><div class="section-title">Step 5 · Strategies</div><a class="open-tab" href="#strategies">open the tab →</a></div>
+      <div class="io-row">
+        <span class="io-pill"><b>in:</b> Samsung's levers + the memo's own alternatives</span>
+        <span class="pipe-sep">→</span>
+        <span class="io-pill"><b>out:</b> five structurally distinct strategies — each a pure L-configuration</span>
+      </div>
+      <p class="step-what">The mirror image of step 3: where worlds were pure X-vectors, each strategy is a pure setting of Samsung's levers. The candidates are forced to span the whole response space — build it all, shrink it, change the product, sell shovels, walk away — three of them lifted from inside the memo itself.</p>
+      <div class="step-cols">
+        <div class="step-box" style="background: var(--paper); border: 1px solid var(--line);"><span class="label-rule">THE RULE · </span>Strategies may touch only L — they cannot wish the weather better.</div>
+        <div class="step-box" style="background: var(--tint); border-left: 3px solid var(--amber);"><span class="label-why">WHY IT MATTERS · </span>Diversity by construction: when one strategy later dominates the regret table, it is a result, not an artifact of a narrow menu.</div>
+      </div>
+    </section>
+
+    <!-- Step 6 -->
+    <section class="section">
+      <div class="section-head"><div class="section-title">Step 6 · Matrix + Regret</div><a class="open-tab" href="#regret">open the tab →</a></div>
+      <div class="io-row">
+        <span class="io-pill"><b>in:</b> 5 strategies × 4 worlds — 20 runs</span>
+        <span class="pipe-sep">→</span>
+        <span class="io-pill"><b>out:</b> an NPV grid, and the regret read off it</span>
+      </div>
+      <p class="step-what">Every strategy runs under every world. Regret in a world is the gap to the best strategy in that world. Minimax regret picks the strategy whose worst miss is smallest: robust, rather than optimal-on-average.</p>
+      <div class="step-cols">
+        <div class="step-box" style="background: var(--paper); border: 1px solid var(--line);"><span class="label-rule">THE RULE · </span>Every cell comes from the same engine — no row gets a friendlier model.</div>
+        <div class="step-box" style="background: var(--tint); border-left: 3px solid var(--amber);"><span class="label-why">WHY IT MATTERS · </span>The recommendation stops depending on probabilities nobody can defend. No expected value is ever computed.</div>
+      </div>
+    </section>
+
+    <!-- Step 7 -->
+    <section class="section">
+      <div class="section-head"><div class="section-title">Step 7 · Pathway</div><a class="open-tab" href="#pathway">open the tab →</a></div>
+      <div class="io-row">
+        <span class="io-pill"><b>in:</b> the regret table + the worlds' observable differences</span>
+        <span class="pipe-sep">→</span>
+        <span class="io-pill"><b>out:</b> signposts, triggers, staged commitment — and a re-instantiation loop</span>
+      </div>
+      <p class="step-what">The worlds differ in observable ways years before the cash proves anything (a license event; price erosion). Those observables become signposts; signposts get tripwires; commitments are staged so capital is only released as the real world reveals which future it is.</p>
+      <div class="step-cols">
+        <div class="step-box" style="background: var(--paper); border: 1px solid var(--line);"><span class="label-rule">THE RULE · </span>Commit only what the observed world has licensed.</div>
+        <div class="step-box" style="background: var(--tint); border-left: 3px solid var(--amber);"><span class="label-why">WHY IT MATTERS · </span>The output is not a forecast but a monitoring system — a decision that adapts instead of a number that ages.</div>
+      </div>
+    </section>
+
+    <!-- The discipline -->
+    <section class="section">
+      <div class="section-head"><div class="section-title">The discipline behind the seven steps</div></div>
+      <div style="font-size: 14px; border-radius: 6px; padding: 14px; background: var(--navy); color: var(--ice); line-height: 1.7;">
+        Everything above was run <b style="color: var(--amber);">by hand, end to end, once</b> — before any automation.
+        The point of doing it manually is to validate the method itself: where extraction is ambiguous, where calibration bites, which rules actually prevent confabulation.
+        Only a method that has survived a full manual pass on a real memo earns the right to be productized.
+      </div>
+      <div class="note">The division of labor throughout: the LLM frames worlds and proposes parameter shifts; the ~200-line engine — not the LLM — delivers every number. That split is enforced by the grammar on the next tab.</div>
+    </section>
+  </div>
+</body>
+</html>

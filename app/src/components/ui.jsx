@@ -2,10 +2,10 @@ import { C, MONO, SERIF } from "../theme.js";
 
 export function Section({ title, right, children, className = "" }) {
   return (
-    <div className={`rounded-lg p-4 mb-4 ${className}`} style={{ background: C.card, border: `1px solid ${C.line}` }}>
+    <div className={`rounded-lg mb-4 ${className}`} style={{ background: C.card, border: `1px solid ${C.line}`, padding: 20 }}>
       {(title || right) && (
-        <div className="flex items-center justify-between mb-2 gap-3 flex-wrap">
-          <div className="text-xs uppercase tracking-wider" style={{ color: C.muted, fontWeight: 700 }}>{title}</div>
+        <div className="flex items-center justify-between gap-3 flex-wrap" style={{ marginBottom: 14 }}>
+          <div className="uppercase" style={{ fontSize: 11, letterSpacing: "0.08em", color: C.muted, fontWeight: 700 }}>{title}</div>
           {right}
         </div>
       )}
@@ -16,10 +16,10 @@ export function Section({ title, right, children, className = "" }) {
 
 export function PageHead({ kicker, title, sub }) {
   return (
-    <div className="mb-4">
-      {kicker && <div className="text-xs uppercase tracking-wider mb-1" style={{ color: C.amber, fontWeight: 700 }}>{kicker}</div>}
-      <div className="text-2xl" style={{ fontFamily: SERIF, color: C.navy, fontWeight: 700 }}>{title}</div>
-      {sub && <div className="text-sm mt-1" style={{ color: C.muted, maxWidth: 880, lineHeight: 1.55 }}>{sub}</div>}
+    <div className="mb-6">
+      {kicker && <div className="uppercase" style={{ fontSize: 11, letterSpacing: "0.08em", color: C.amber, fontWeight: 700, marginBottom: 6 }}>{kicker}</div>}
+      <div style={{ fontFamily: SERIF, color: C.navy, fontWeight: 700, fontSize: 28, lineHeight: 1.2 }}>{title}</div>
+      {sub && <div className="text-sm mt-2" style={{ color: C.muted, maxWidth: 880, lineHeight: 1.55 }}>{sub}</div>}
     </div>
   );
 }
@@ -57,7 +57,7 @@ export function Pill({ children, color = C.navy, fg = "#fff" }) {
 }
 
 export function Note({ children }) {
-  return <div className="text-xs mt-2 italic" style={{ color: C.muted, lineHeight: 1.5 }}>{children}</div>;
+  return <div className="text-xs mt-3 italic" style={{ color: C.muted, lineHeight: 1.5 }}>{children}</div>;
 }
 
 export const th = { background: C.navy, color: "#fff", fontFamily: MONO, fontSize: 10, padding: "6px 8px", textAlign: "left", whiteSpace: "nowrap" };

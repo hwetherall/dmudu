@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Uncertainty — Samsung LEO · Deep Uncertainty Workbench</title>
+  <style>
+    :root {
+      --navy: #1A2238;
+      --ink: #232A40;
+      --paper: #F7F9FC;
+      --card: #FFFFFF;
+      --ice: #CADCFC;
+      --amber: #E8A33D;
+      --good: #2E7D5B;
+      --bad: #B23A48;
+      --mid: #8A6D1F;
+      --muted: #5A6478;
+      --line: #D7DEEA;
+      --tint: #E9EEF7;
+      --mono: ui-monospace, Menlo, Consolas, monospace;
+      --serif: Georgia, Cambria, serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .wrap { max-width: 1040px; margin: 0 auto; padding: 40px 24px 64px; }
+
+    .app-head { border-bottom: 1px solid var(--line); padding-bottom: 16px; margin-bottom: 28px; }
+    .app-title { font-family: var(--serif); font-weight: 700; color: var(--navy); font-size: 22px; line-height: 1.2; }
+    .app-sub { font-family: var(--mono); color: var(--muted); font-size: 12px; margin-top: 6px; }
+
+    .kicker { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--amber); font-weight: 700; margin-bottom: 6px; }
+    .page-title { font-family: var(--serif); color: var(--navy); font-weight: 700; font-size: 28px; line-height: 1.2; }
+    .page-sub { font-size: 14px; margin-top: 8px; color: var(--muted); max-width: 880px; line-height: 1.55; }
+
+    .section { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 20px; margin-bottom: 16px; }
+    .section-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+    .section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 700; }
+
+    .note { font-size: 12px; margin-top: 12px; font-style: italic; color: var(--muted); line-height: 1.5; }
+
+    /* Staircase */
+    .staircase { display: flex; align-items: stretch; gap: 0; min-height: 150px; }
+    .stair-col { display: flex; align-items: stretch; flex: 1; min-width: 0; }
+    .wall {
+      position: relative;
+      width: 10px;
+      margin: 0 4px;
+      border-radius: 3px;
+      background: repeating-linear-gradient(45deg, var(--amber), var(--amber) 6px, var(--navy) 6px, var(--navy) 12px);
+    }
+    .wall-label {
+      position: absolute;
+      font-family: var(--mono);
+      font-weight: 700;
+      font-size: 12px;
+      background: var(--amber);
+      color: var(--navy);
+      border-radius: 3px;
+      padding: 2px 6px;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      white-space: nowrap;
+      z-index: 2;
+    }
+    .stair-box {
+      flex: 1;
+      min-width: 0;
+      border-radius: 8px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+    .stair-level { font-family: var(--mono); font-weight: 700; font-size: 12px; }
+    .stair-name { font-family: var(--serif); font-weight: 700; font-size: 12px; margin-top: 2px; line-height: 1.3; }
+
+    /* Level card */
+    .level-tags { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 10px; }
+    .tag-pill { font-family: var(--mono); font-weight: 700; font-size: 12px; border-radius: 4px; padding: 3px 8px; }
+    .level-what { font-size: 14px; margin-bottom: 14px; color: var(--ink); line-height: 1.65; max-width: 920px; }
+    .level-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+    .level-box { border-radius: 6px; padding: 12px; }
+    .level-box-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; font-weight: 700; }
+    .level-item { font-size: 12px; display: flex; gap: 6px; padding: 2px 0; color: var(--ink); line-height: 1.5; }
+    .level-item .dot { color: var(--amber); font-weight: 700; }
+
+    /* The wall section */
+    .wall-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; margin-bottom: 12px; }
+    .wall-card { border-radius: 8px; padding: 14px; }
+    .wall-card-title { font-size: 14px; margin-bottom: 6px; font-family: var(--serif); font-weight: 700; }
+    .wall-card-body { font-size: 12px; line-height: 1.7; }
+    .callout { font-size: 14px; border-radius: 6px; padding: 12px; margin-bottom: 12px; color: var(--ink); line-height: 1.65; }
+
+    .btn-row { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+    .btn { font-family: var(--mono); font-weight: 700; font-size: 12px; border-radius: 4px; padding: 7px 12px; text-decoration: none; display: inline-block; }
+    .btn-navy { background: var(--navy); color: #fff; border: 1px solid var(--navy); }
+    .btn-paper { background: var(--paper); color: var(--navy); border: 1px solid var(--line); }
+
+    @media print { body { background: #fff; } .wrap { padding: 0; max-width: none; } .section { break-inside: avoid; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="app-head">
+      <div class="app-title">Samsung LEO · Deep Uncertainty Workbench</div>
+      <div class="app-sub">Innovera · the worked example behind the Pedram pack · every number cited, derived, computed, or declared</div>
+    </header>
+
+    <!-- PageHead -->
+    <div style="margin-bottom: 24px;">
+      <div class="kicker">The framing — four levels of uncertainty</div>
+      <div class="page-title">Not all uncertainty is the same problem</div>
+      <div class="page-sub">A refresher on the Walker / Courtney ladder — because everything in this workbench hangs on one distinction: uncertainty you can buy down with information, versus uncertainty that only the world can resolve. The Samsung verdict turns on the second kind.</div>
+    </div>
+
+    <!-- The ladder -->
+    <section class="section">
+      <div class="section-head"><div class="section-title">The ladder — and where the wall sits</div></div>
+      <div class="staircase">
+        <div class="stair-col">
+          <div class="stair-box" style="background: var(--tint); border: 1px solid var(--line); margin-top: 78px;">
+            <div class="stair-level" style="color: var(--muted);">LEVEL 1</div>
+            <div class="stair-name" style="color: var(--navy);">A clear enough future</div>
+          </div>
+        </div>
+        <div class="stair-col">
+          <div class="stair-box" style="background: var(--tint); border: 1px solid var(--line); margin-top: 52px; margin-left: 4px;">
+            <div class="stair-level" style="color: var(--muted);">LEVEL 2</div>
+            <div class="stair-name" style="color: var(--navy);">Alternate futures, with probabilities</div>
+          </div>
+        </div>
+        <div class="stair-col">
+          <div class="wall"><div class="wall-label">THE WALL</div></div>
+          <div class="stair-box" style="background: var(--navy); border: 1px solid var(--navy); margin-top: 26px; margin-left: 4px;">
+            <div class="stair-level" style="color: var(--amber);">LEVEL 3</div>
+            <div class="stair-name" style="color: #fff;">A few plausible futures — no credible probabilities</div>
+          </div>
+        </div>
+        <div class="stair-col">
+          <div class="stair-box" style="background: var(--navy); border: 1px solid var(--navy); margin-top: 0; margin-left: 4px;">
+            <div class="stair-level" style="color: var(--amber);">LEVEL 4</div>
+            <div class="stair-name" style="color: #fff;">True ambiguity — unknown unknowns</div>
+          </div>
+        </div>
+      </div>
+      <div class="note">Levels 1–2: analysis converges on an answer. Levels 3–4: analysis can only map the territory. The wall between 2 and 3 is where the method must change.</div>
+    </section>
+
+    <!-- Level 1 -->
+    <section class="section">
+      <div class="section-head"><div class="section-title">Level 1 · A clear enough future</div></div>
+      <div class="level-tags">
+        <span class="tag-pill" style="background: var(--tint); color: var(--navy);">the question: What will happen?</span>
+      </div>
+      <p class="level-what">A single forecast is accurate enough to make the decision. Residual uncertainty is noise around one trajectory — wide enough to need error bars, narrow enough not to change the answer.</p>
+      <div class="level-cols">
+        <div class="level-box" style="background: var(--paper); border: 1px solid var(--line);">
+          <div class="level-box-title" style="color: var(--muted);">Key characteristics</div>
+          <div class="level-item"><span class="dot">·</span>Stable environment, abundant history</div>
+          <div class="level-item"><span class="dot">·</span>Well-understood causal structure</div>
+          <div class="level-item"><span class="dot">·</span>Errors are symmetric and bounded</div>
+        </div>
+        <div class="level-box" style="background: var(--paper); border: 1px solid var(--line);">
+          <div class="level-box-title" style="color: var(--muted);">The right tools</div>
+          <div class="level-item"><span class="dot">·</span>Point forecasts</div>
+          <div class="level-item"><span class="dot">·</span>DCF / NPV on a single case</div>
+          <div class="level-item"><span class="dot">·</span>Sensitivity as error bars</div>
+        </div>
+        <div class="level-box" style="background: var(--tint); border: 1px solid var(--line);">
+          <div class="level-box-title" style="color: var(--muted);">In this case</div>
+          <div style="font-size: 12px; color: var(--ink); line-height: 1.6;">Will GEO satellite latency stay in the 600–800 ms band? Yes — it is set by orbital altitude and the speed of light. Physics does not negotiate.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Level 2 -->
+    <section class="section">
+      <div class="section-head"><div class="section-title">Level 2 · Alternate futures, with probabilities</div></div>
+      <div class="level-tags">
+        <span class="tag-pill" style="background: var(--tint); color: var(--navy);">the question: What are the odds?</span>
+        <span class="tag-pill" style="background: var(--amber); color: var(--navy);">standard analysis lives here — Innovera today</span>
+      </div>
+      <p class="level-what">The future forks into a few discrete outcomes — and the odds attached to each are credible, because they come from data, structure, or a process you can study. This is risk in the classic sense: countable outcomes, defensible probabilities.</p>
+      <div class="level-cols">
+        <div class="level-box" style="background: var(--paper); border: 1px solid var(--line);">
+          <div class="level-box-title" style="color: var(--muted);">Key characteristics</div>
+          <div class="level-item"><span class="dot">·</span>Outcome set is enumerable</div>
+          <div class="level-item"><span class="dot">·</span>Probabilities are estimable, not invented</div>
+          <div class="level-item"><span class="dot">·</span>More analysis genuinely shrinks the uncertainty</div>
+        </div>
+        <div class="level-box" style="background: var(--paper); border: 1px solid var(--line);">
+          <div class="level-box-title" style="color: var(--muted);">The right tools</div>
+          <div class="level-item"><span class="dot">·</span>Decision trees, expected value</div>
+          <div class="level-item"><span class="dot">·</span>Monte Carlo over known distributions</div>
+          <div class="level-item"><span class="dot">·</span>Real options on discrete events</div>
+        </div>
+        <div class="level-box" style="background: var(--tint); border: 1px solid var(--line);">
+          <div class="level-box-title" style="color: var(--muted);">In this case</div>
+          <div style="font-size: 12px; color: var(--ink); line-height: 1.6;">What will a user terminal cost at 1M-unit volume? A bottom-up BOM study yields a defensible range with odds. This is exactly the uncertainty the memo's Phase-1 budget is designed to buy down.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Level 3 (dark) -->
+    <section class="section">
+      <div class="section-head"><div class="section-title">Level 3 · A few plausible futures — no credible probabilities</div></div>
+      <div class="level-tags">
+        <span class="tag-pill" style="background: var(--navy); color: var(--amber);">the question: Under which futures does this decision survive?</span>
+        <span class="tag-pill" style="background: var(--amber); color: var(--navy);">the defensible territory — where this workbench operates</span>
+      </div>
+      <p class="level-what">You can still bound the future with a handful of scenarios — but there is no defensible basis for odds. The outcome hangs on choices other actors have not yet made. Assigning probabilities here doesn't add rigor; it launders guesswork into math. This is where deep uncertainty begins.</p>
+      <div class="level-cols">
+        <div class="level-box" style="background: var(--paper); border: 1px solid var(--line);">
+          <div class="level-box-title" style="color: var(--muted);">Key characteristics</div>
+          <div class="level-item"><span class="dot">·</span>Driven by other actors' strategic choices — politics, regulators, rivals</div>
+          <div class="level-item"><span class="dot">·</span>No dataset exists; the future is decided, not revealed</div>
+          <div class="level-item"><span class="dot">·</span>Probabilities would be invented, then mistaken for analysis</div>
+        </div>
+        <div class="level-box" style="background: var(--paper); border: 1px solid var(--line);">
+          <div class="level-box-title" style="color: var(--muted);">The right tools</div>
+          <div class="level-item"><span class="dot">·</span>Scenario construction (worlds)</div>
+          <div class="level-item"><span class="dot">·</span>Robustness testing across worlds</div>
+          <div class="level-item"><span class="dot">·</span>Minimax regret instead of expected value</div>
+        </div>
+        <div class="level-box" style="background: var(--navy); border: 1px solid var(--navy);">
+          <div class="level-box-title" style="color: var(--amber);">In this case</div>
+          <div style="font-size: 12px; color: var(--ice); line-height: 1.6;">Will sovereign governments still pay a premium for non-US infrastructure in 2032? That depends on elections, alliances, and incumbents' concessions — decisions not yet made, by actors who don't yet know themselves.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Level 4 (dark) -->
+    <section class="section">
+      <div class="section-head"><div class="section-title">Level 4 · True ambiguity — unknown unknowns</div></div>
+      <div class="level-tags">
+        <span class="tag-pill" style="background: var(--navy); color: var(--amber);">the question: How do we stay adaptable?</span>
+      </div>
+      <p class="level-what">Even the futures can't be enumerated; no scenario set is credible. Novel technology, novel markets and novel regulation interact in ways no one can pre-state. The only defensible posture is to design the decision itself for adaptation.</p>
+      <div class="level-cols">
+        <div class="level-box" style="background: var(--paper); border: 1px solid var(--line);">
+          <div class="level-box-title" style="color: var(--muted);">Key characteristics</div>
+          <div class="level-item"><span class="dot">·</span>Futures cannot be listed, let alone weighted</div>
+          <div class="level-item"><span class="dot">·</span>Multiple novelties interacting</div>
+          <div class="level-item"><span class="dot">·</span>Resolves only by acting, observing, adapting</div>
+        </div>
+        <div class="level-box" style="background: var(--paper); border: 1px solid var(--line);">
+          <div class="level-box-title" style="color: var(--muted);">The right tools</div>
+          <div class="level-item"><span class="dot">·</span>Signposts &amp; triggers</div>
+          <div class="level-item"><span class="dot">·</span>Staged commitment, options to exit</div>
+          <div class="level-item"><span class="dot">·</span>Adaptive pathways — act, monitor, re-plan</div>
+        </div>
+        <div class="level-box" style="background: var(--navy); border: 1px solid var(--navy);">
+          <div class="level-box-title" style="color: var(--amber);">In this case</div>
+          <div style="font-size: 12px; color: var(--ice); line-height: 1.6;">What does the orbital economy look like in 2040 — debris regimes, mega-constellation shakeouts, direct-to-device upending terrestrial telcos? We cannot even list the candidate futures.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- The wall section -->
+    <section class="section">
+      <div class="section-head"><div class="section-title">The wall — why the move from level 2 to level 3 changes everything</div></div>
+      <div class="wall-cols">
+        <div class="wall-card" style="background: var(--tint); border: 1px solid var(--line);">
+          <div class="wall-card-title" style="color: var(--navy);">Level 2 · buy information</div>
+          <div class="wall-card-body" style="color: var(--ink);">
+            The uncertainty lives <b>in our heads</b>. The world already holds an answer — a BOM cost, a launch quote, an MNO's willingness to sign — and study reveals it.
+            More data shrinks the error bars. The right move is to analyze harder. The memo's own Phase-1 budget ($1.5–2.5M over 18 months: block-buy pricing, LOIs, BOM studies) is precisely this — and it is the correct instrument for these uncertainties.
+          </div>
+        </div>
+        <div class="wall-card" style="background: var(--navy); border: 1px solid var(--navy);">
+          <div class="wall-card-title" style="color: #fff;">Level 3 · buy robustness</div>
+          <div class="wall-card-body" style="color: var(--ice);">
+            The uncertainty lives <b style="color: var(--amber);">in the world</b>. The answer does not exist yet — sovereignty politics in 2032, the structure of the launch market — it will be <i>decided</i>, over years, by actors who haven't chosen.
+            More analysis adds only invented precision. The right move is to stop forecasting and start stress-testing: find the decision that survives every plausible future, and instrument the ones it doesn't.
+          </div>
+        </div>
+      </div>
+      <div class="callout" style="background: rgba(178,58,72,0.07); border-left: 4px solid var(--bad);">
+        The most common failure in strategy work is treating level 3 as level 2: putting made-up probabilities on scenarios and averaging them into one confident number.
+        The math looks rigorous; the inputs are guesses wearing suits. <b>Once probabilities can't be defended, expected value stops being an honest summary — and robustness has to replace it.</b>
+      </div>
+      <div class="callout" style="background: var(--tint); border-left: 4px solid var(--amber);">
+        Applied here: the Samsung verdict turns on uncertainties no Phase-1 study can resolve — sovereignty politics and launch-market structure.
+        Better information stops helping at the level-2/3 boundary. <b>That is the wall, and the opportunity:</b> the analysis that follows is what working <i>on the far side</i> of it looks like.
+      </div>
+      <div class="btn-row">
+        <a class="btn btn-navy" href="#method">how we work past the wall — the method →</a>
+        <a class="btn btn-paper" href="#worlds">see the level-3 futures — the worlds →</a>
+      </div>
+    </section>
+  </div>
+</body>
+</html>

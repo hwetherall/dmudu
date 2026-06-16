@@ -10,14 +10,15 @@ const LEVELS = [
 
 const FRAMING = [
   { tab: "uncertainty", title: "Uncertainty", sub: "The four levels, in depth — and the wall between level 2 and level 3 that this whole exercise exists to cross." },
-  { tab: "method", title: "Method", sub: "Seven steps from memo to robust decision: extract, calibrate, worlds, verdicts, strategies, regret, pathway. Each step is a tab here." },
+  { tab: "method", title: "Method", sub: "Seven steps from memo to robust decision: extract, calibrate, model, worlds, strategies, regret, pathway. Each step is a tab here." },
   { tab: "grammar", title: "Grammar", sub: "XLRM as a type system: who may move which dial, and why confabulation becomes a type error." },
 ];
 
 const PIPELINE = [
   { n: 1, name: "Extract", tab: "schema", what: "memo → cited parameter schema" },
   { n: 2, name: "Calibrate", tab: "calibration", what: "the memo's own numbers are the test suite" },
-  { n: "3–4", name: "Worlds + Verdicts", tab: "worlds", what: "four futures, verdict rule fixed ex ante" },
+  { n: 3, name: "Model", tab: "cashflow", what: "the visual cash-flow machine, live from the engine" },
+  { n: 4, name: "Worlds", tab: "worlds", what: "four futures, verdict rule fixed ex ante" },
   { n: 5, name: "Strategies", tab: "strategies", what: "five L-configurations, diverse by construction" },
   { n: 6, name: "Regret", tab: "regret", what: "5 strategies × 4 worlds, minimax regret" },
   { n: 7, name: "Pathway", tab: "pathway", what: "signposts, triggers, staged commitment" },

@@ -6,6 +6,7 @@ import Method from "./views/Method.jsx";
 import Grammar from "./views/Grammar.jsx";
 import Schema from "./views/Schema.jsx";
 import Calibration from "./views/Calibration.jsx";
+import CashFlow from "./views/CashFlow.jsx";
 import Worlds from "./views/Worlds.jsx";
 import Strategies from "./views/Strategies.jsx";
 import Regret from "./views/Regret.jsx";
@@ -19,7 +20,8 @@ const TABS = [
   { id: "grammar", label: "Grammar", View: Grammar },
   { id: "schema", label: "1 · Extract", View: Schema, divider: true },
   { id: "calibration", label: "2 · Calibrate", View: Calibration },
-  { id: "worlds", label: "3–4 · Worlds", View: Worlds },
+  { id: "cashflow", label: "3 · Model", View: CashFlow },
+  { id: "worlds", label: "4 · Worlds", View: Worlds },
   { id: "strategies", label: "5 · Strategies", View: Strategies },
   { id: "regret", label: "6 · Regret", View: Regret },
   { id: "pathway", label: "7 · Pathway", View: Pathway },

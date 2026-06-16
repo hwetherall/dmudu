@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Grammar — Samsung LEO · Deep Uncertainty Workbench</title>
+  <style>
+    :root {
+      --navy: #1A2238;
+      --ink: #232A40;
+      --paper: #F7F9FC;
+      --card: #FFFFFF;
+      --ice: #CADCFC;
+      --amber: #E8A33D;
+      --good: #2E7D5B;
+      --bad: #B23A48;
+      --mid: #8A6D1F;
+      --muted: #5A6478;
+      --line: #D7DEEA;
+      --tint: #E9EEF7;
+      --mono: ui-monospace, Menlo, Consolas, monospace;
+      --serif: Georgia, Cambria, serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .wrap { max-width: 1040px; margin: 0 auto; padding: 40px 24px 64px; }
+
+    .app-head { border-bottom: 1px solid var(--line); padding-bottom: 16px; margin-bottom: 28px; }
+    .app-title { font-family: var(--serif); font-weight: 700; color: var(--navy); font-size: 22px; line-height: 1.2; }
+    .app-sub { font-family: var(--mono); color: var(--muted); font-size: 12px; margin-top: 6px; }
+
+    .kicker { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--amber); font-weight: 700; margin-bottom: 6px; }
+    .page-title { font-family: var(--serif); color: var(--navy); font-weight: 700; font-size: 28px; line-height: 1.2; }
+    .page-sub { font-size: 14px; margin-top: 8px; color: var(--muted); max-width: 880px; line-height: 1.55; }
+
+    .section { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 20px; margin-bottom: 16px; }
+    .section-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+    .section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 700; }
+
+    .note { font-size: 12px; margin-top: 12px; font-style: italic; color: var(--muted); line-height: 1.5; }
+
+    /* ---- XLRM flow diagram ---- */
+    .diagram { width: 100%; height: auto; display: block; }
+
+    /* The single take-away line under the diagram — the page's thesis in one breath */
+    .takeaway {
+      margin-top: 18px;
+      border-left: 4px solid var(--amber);
+      background: var(--tint);
+      border-radius: 6px;
+      padding: 14px 16px;
+      font-family: var(--serif);
+      font-size: 17px;
+      line-height: 1.5;
+      color: var(--navy);
+    }
+    .takeaway b { color: var(--navy); }
+    .takeaway .x { color: var(--amber); font-weight: 700; }
+    .takeaway .l { color: var(--navy); font-weight: 700; }
+
+    /* Compressed full-parameter reference (the leave-behind detail; every cited dial preserved) */
+    .ref { margin-top: 18px; padding-top: 16px; border-top: 1px dashed var(--line); }
+    .ref-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 700; margin-bottom: 10px; }
+    .ref-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+    .ref-col-head { font-family: var(--mono); font-weight: 700; font-size: 12px; margin-bottom: 6px; }
+    .ref-list { display: flex; flex-wrap: wrap; gap: 5px; }
+    .chip { font-family: var(--mono); font-size: 11px; border-radius: 4px; padding: 3px 7px; background: var(--tint); color: var(--navy); }
+
+    /* ---- safety rail ---- */
+    .prose { font-size: 14px; margin-bottom: 14px; color: var(--ink); line-height: 1.65; max-width: 920px; }
+    .rail { background: var(--navy); border-radius: 8px; padding: 18px 20px; margin-bottom: 14px; }
+    .rail-row { padding: 10px 0; }
+    .rail-row + .rail-row { border-top: 1px solid rgba(202,220,252,0.15); }
+    .rail-move { font-family: var(--mono); font-size: 14px; color: var(--ice); line-height: 1.6; }
+    .rail-move .who { color: var(--amber); font-weight: 700; }
+    .rail-verdict { display: flex; align-items: baseline; gap: 10px; margin-top: 6px; }
+    .rail-stamp { font-family: var(--mono); font-weight: 700; font-size: 11px; letter-spacing: 0.06em; color: #fff; background: var(--bad); border-radius: 3px; padding: 2px 7px; flex: none; }
+    .rail-reason { font-family: var(--mono); font-size: 13px; color: #E89AA5; line-height: 1.55; }
+    .callout { font-size: 14px; border-radius: 6px; padding: 12px; color: var(--ink); line-height: 1.6; }
+
+    /* ---- worked example: one real run flowing through the machine ---- */
+    .run { display: flex; align-items: stretch; gap: 0; }
+    .run-stage { flex: 1; min-width: 0; border-radius: 8px; padding: 14px 14px 16px; position: relative; overflow: hidden; }
+    .run-stage .glyph {
+      position: absolute; top: 6px; right: 10px;
+      font-family: var(--serif); font-weight: 700; font-size: 46px; line-height: 1;
+      opacity: 0.16; pointer-events: none;
+    }
+    .run-label { font-family: var(--mono); font-weight: 700; font-size: 11px; letter-spacing: 0.04em; margin-bottom: 12px; }
+    .run-hero { font-family: var(--serif); font-weight: 700; font-size: 30px; line-height: 1.05; margin-bottom: 4px; }
+    .run-hero-sub { font-family: var(--mono); font-size: 12px; margin-bottom: 10px; }
+    .run-body { font-size: 12px; line-height: 1.6; }
+    .die-pill { display: inline-block; font-family: var(--mono); font-weight: 700; font-size: 12px; color: #fff; background: var(--bad); border-radius: 3px; padding: 2px 8px; margin-left: 8px; vertical-align: 2px; }
+    .run-arrow { flex: none; align-self: center; color: var(--amber); font-weight: 700; font-size: 26px; padding: 0 6px; }
+
+    .punch { margin-top: 16px; border-radius: 6px; padding: 14px 16px; background: var(--navy); color: var(--ice); font-size: 14px; line-height: 1.7; }
+    .punch .x { color: var(--amber); font-weight: 700; }
+
+    .btn-row { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+    .btn { font-family: var(--mono); font-weight: 700; font-size: 12px; border-radius: 4px; padding: 7px 12px; text-decoration: none; display: inline-block; }
+    .btn-navy { background: var(--navy); color: #fff; border: 1px solid var(--navy); }
+    .btn-paper { background: var(--paper); color: var(--navy); border: 1px solid var(--line); }
+
+    @media (max-width: 760px) {
+      .run { flex-direction: column; }
+      .run-arrow { transform: rotate(90deg); padding: 4px 0; }
+    }
+    @media print { body { background: #fff; } .wrap { padding: 0; max-width: none; } .section { break-inside: avoid; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="app-head">
+      <div class="app-title">Samsung LEO · Deep Uncertainty Workbench</div>
+      <div class="app-sub">Innovera · the worked example behind the Pedram pack · every number cited, derived, computed, or declared</div>
+    </header>
+
+    <!-- PageHead -->
+    <div style="margin-bottom: 24px;">
+      <div class="kicker">The grammar — XLRM (Lempert / RAND), operationalized literally</div>
+      <div class="page-title">Two sets of dials, one engine, one readout</div>
+      <div class="page-sub">XLRM is usually a workshop checklist. Here it is enforced as a type system: every one of the 24 extracted parameters carries a tag, and the tag decides who may move it. The whole architecture of the workbench is in the diagram below.</div>
+    </div>
+
+    <!-- The machine -->
+    <section class="section">
+      <div class="section-head"><div class="section-title">The machine — how the four parts relate</div></div>
+
+      <svg class="diagram" viewBox="0 0 1000 470" role="img"
+           aria-label="XLRM flow: X (world-owned dials) and L (Samsung-owned dials) are two independent inputs that both feed one engine R, which computes the metrics M.">
+        <defs>
+          <marker id="hX" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#E8A33D"/></marker>
+          <marker id="hL" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1A2238"/></marker>
+          <marker id="hM" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2E7D5B"/></marker>
+        </defs>
+
+        <!-- column captions -->
+        <text x="194" y="28" text-anchor="middle" fill="#5A6478" font-family="ui-monospace, Menlo, Consolas, monospace" font-weight="700" font-size="11" letter-spacing="1.5">TWO INDEPENDENT INPUTS</text>
+        <text x="570" y="28" text-anchor="middle" fill="#5A6478" font-family="ui-monospace, Menlo, Consolas, monospace" font-weight="700" font-size="11" letter-spacing="1.5">ONE SHARED ENGINE</text>
+        <text x="880" y="28" text-anchor="middle" fill="#5A6478" font-family="ui-monospace, Menlo, Consolas, monospace" font-weight="700" font-size="11" letter-spacing="1.5">THE READOUT</text>
+
+        <!-- ===== X box (world-owned) ===== -->
+        <rect x="44" y="46" width="300" height="150" rx="12" fill="#FFFFFF" stroke="#E8A33D" stroke-width="2.5"/>
+        <text x="84" y="128" text-anchor="middle" fill="#E8A33D" font-family="Georgia, Cambria, serif" font-weight="700" font-size="62">X</text>
+        <text x="132" y="92" fill="#1A2238" font-family="Georgia, Cambria, serif" font-weight="700" font-size="20">Exogenous</text>
+        <text x="132" y="116" fill="#E8A33D" font-family="ui-monospace, Menlo, Consolas, monospace" font-weight="700" font-size="13">the world sets these</text>
+        <!-- two example pills -->
+        <rect x="62" y="150" width="124" height="28" rx="6" fill="#E9EEF7"/>
+        <text x="124" y="169" text-anchor="middle" fill="#1A2238" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="12">launch $/kg</text>
+        <rect x="194" y="150" width="134" height="28" rx="6" fill="#E9EEF7"/>
+        <text x="261" y="169" text-anchor="middle" fill="#1A2238" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="12">sovereignty $</text>
+
+        <!-- ===== L box (Samsung-owned) ===== -->
+        <rect x="44" y="276" width="300" height="150" rx="12" fill="#FFFFFF" stroke="#1A2238" stroke-width="2.5"/>
+        <text x="84" y="358" text-anchor="middle" fill="#1A2238" font-family="Georgia, Cambria, serif" font-weight="700" font-size="62">L</text>
+        <text x="132" y="322" fill="#1A2238" font-family="Georgia, Cambria, serif" font-weight="700" font-size="20">Levers</text>
+        <text x="132" y="346" fill="#1A2238" font-family="ui-monospace, Menlo, Consolas, monospace" font-weight="700" font-size="13">Samsung sets these</text>
+        <rect x="62" y="380" width="150" height="28" rx="6" fill="#E9EEF7"/>
+        <text x="137" y="399" text-anchor="middle" fill="#1A2238" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="12">constellation size</text>
+        <rect x="220" y="380" width="108" height="28" rx="6" fill="#E9EEF7"/>
+        <text x="274" y="399" text-anchor="middle" fill="#1A2238" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="12">build / walk</text>
+
+        <!-- asymmetry verbs -->
+        <text x="404" y="112" text-anchor="middle" fill="#E8A33D" font-family="ui-monospace, Menlo, Consolas, monospace" font-weight="700" font-size="13">explore</text>
+        <text x="404" y="372" text-anchor="middle" fill="#1A2238" font-family="ui-monospace, Menlo, Consolas, monospace" font-weight="700" font-size="13">choose</text>
+        <text x="734" y="226" text-anchor="middle" fill="#2E7D5B" font-family="ui-monospace, Menlo, Consolas, monospace" font-weight="700" font-size="13">compute</text>
+
+        <!-- converging arrows (never cross each other = independence) -->
+        <path d="M348,121 C 410,121 410,200 454,200" fill="none" stroke="#E8A33D" stroke-width="2.5" marker-end="url(#hX)"/>
+        <path d="M348,351 C 410,351 410,280 454,280" fill="none" stroke="#1A2238" stroke-width="2.5" marker-end="url(#hL)"/>
+
+        <!-- ===== R engine ===== -->
+        <rect x="460" y="150" width="220" height="180" rx="14" fill="#1A2238"/>
+        <text x="570" y="218" text-anchor="middle" fill="#E8A33D" font-family="Georgia, Cambria, serif" font-weight="700" font-size="58">R</text>
+        <text x="570" y="246" text-anchor="middle" fill="#E8A33D" font-family="ui-monospace, Menlo, Consolas, monospace" font-weight="700" font-size="12">the engine</text>
+        <text x="570" y="270" text-anchor="middle" fill="#CADCFC" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="12">~200 auditable lines</text>
+        <text x="570" y="288" text-anchor="middle" fill="#CADCFC" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="12">one model — every run</text>
+        <text x="570" y="312" text-anchor="middle" fill="#CADCFC" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="11">the only source of numbers</text>
+
+        <!-- R -> M -->
+        <path d="M684,240 L786,240" fill="none" stroke="#2E7D5B" stroke-width="2.5" marker-end="url(#hM)"/>
+
+        <!-- ===== M box ===== -->
+        <rect x="792" y="168" width="176" height="144" rx="12" fill="#FFFFFF" stroke="#2E7D5B" stroke-width="2.5"/>
+        <text x="880" y="232" text-anchor="middle" fill="#2E7D5B" font-family="Georgia, Cambria, serif" font-weight="700" font-size="50">M</text>
+        <text x="880" y="260" text-anchor="middle" fill="#1A2238" font-family="Georgia, Cambria, serif" font-weight="700" font-size="17">Metrics</text>
+        <text x="880" y="284" text-anchor="middle" fill="#2E7D5B" font-family="ui-monospace, Menlo, Consolas, monospace" font-weight="700" font-size="12">read, never asserted</text>
+      </svg>
+
+      <div class="takeaway">
+        <span class="l">Samsung chooses&nbsp;L.</span> The world owns&nbsp;<span class="x">X</span>, and you can't put odds on it. The same engine&nbsp;R turns every X&nbsp;×&nbsp;L pairing into&nbsp;M — so the goal is the <b>lever-setting that holds up across every world</b>, not the single run that scores best.
+      </div>
+
+      <div class="note">A full column of X values is a <b>world</b>; a full column of L values is a <b>strategy</b>. Read left to right: a world meets a strategy inside the engine, and the only place a number is ever allowed to appear is M. The same R is reused for every world × strategy pair — 20 runs, one engine.</div>
+
+      <!-- preserved detail: every cited dial, by owner -->
+      <div class="ref">
+        <div class="ref-title">Every dial, by owner — the leave-behind detail</div>
+        <div class="ref-grid">
+          <div>
+            <div class="ref-col-head" style="color: var(--amber);">X · the world decides</div>
+            <div class="ref-list">
+              <span class="chip">P5 · launch $/kg</span>
+              <span class="chip">P19 · sovereignty premium</span>
+              <span class="chip">P11 · MNO co-invest share</span>
+              <span class="chip">P20 · $0.30/GB price floor</span>
+              <span class="chip">P22 · regulatory timelines</span>
+            </div>
+          </div>
+          <div>
+            <div class="ref-col-head" style="color: var(--navy);">L · Samsung decides</div>
+            <div class="ref-list">
+              <span class="chip">P1 · constellation size</span>
+              <span class="chip">P2 · first tranche</span>
+              <span class="chip">P12 · specialist headcount</span>
+              <span class="chip">P21 · terminal cost path</span>
+              <span class="chip">build · partner · walk away</span>
+            </div>
+          </div>
+          <div>
+            <div class="ref-col-head" style="color: var(--good);">M · the model computes</div>
+            <div class="ref-list">
+              <span class="chip">breakeven year</span>
+              <span class="chip">cash trough</span>
+              <span class="chip">IRR</span>
+              <span class="chip">Y10 revenue</span>
+              <span class="chip">regret, across worlds</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- The safety rail -->
+    <section class="section">
+      <div class="section-head"><div class="section-title">The safety rail — confabulation becomes a type error</div></div>
+      <p class="prose">
+        The most seductive analytical failure is a story where a strategy quietly improves the weather, or a scenario quietly fixes the plan.
+        Because every dial is tagged with its owner, those stories are unwriteable — the schema rejects them the way a compiler rejects a type error.
+      </p>
+      <div class="rail">
+        <div class="rail-row">
+          <div class="rail-move"><span class="who">a world</span> tries to shrink the constellation &nbsp;→&nbsp; <code style="color:#fff;">world.set("P1", 1000)</code></div>
+          <div class="rail-verdict">
+            <span class="rail-stamp">✕ REJECTED</span>
+            <span class="rail-reason">P1 (constellation size) is L-tagged — Samsung-owned. Worlds may move only X.</span>
+          </div>
+        </div>
+        <div class="rail-row">
+          <div class="rail-move"><span class="who">a strategy</span> tries to raise the sovereignty premium &nbsp;→&nbsp; <code style="color:#fff;">strategy.set("P19", 0.30)</code></div>
+          <div class="rail-verdict">
+            <span class="rail-stamp">✕ REJECTED</span>
+            <span class="rail-reason">P19 (sovereignty premium) is X-tagged — world-owned. Strategies may move only L.</span>
+          </div>
+        </div>
+      </div>
+      <div class="callout" style="background: var(--tint); border-left: 4px solid var(--navy);">
+        The LLM works <i>upstream</i> of the rail: it frames the worlds and proposes which X-dials they move. The numbers themselves come from the ~200-line engine, every time. <b>That split is what makes every figure in this app auditable.</b>
+      </div>
+    </section>
+
+    <!-- A worked example — the machine running once -->
+    <section class="section">
+      <div class="section-head"><div class="section-title">The machine running once — one world, traced through all four letters</div></div>
+
+      <div class="run">
+        <!-- X -->
+        <div class="run-stage" style="background: var(--card); border: 1px solid var(--amber);">
+          <span class="glyph" style="color: var(--amber);">X</span>
+          <div class="run-label" style="color: var(--amber);">THE WORLD MOVES ITS DIALS</div>
+          <div class="run-hero" style="color: var(--navy);">$2,400<span style="font-size:18px;"> /kg</span></div>
+          <div class="run-hero-sub" style="color: var(--muted);">World W1 · "Gated Orbits"</div>
+          <div class="run-body" style="color: var(--muted);">Top of the memo's launch range. Plus MNO co-invest 60%, revenue ×0.95, deployment and revenue each a year late.</div>
+        </div>
+        <div class="run-arrow">→</div>
+
+        <!-- L -->
+        <div class="run-stage" style="background: var(--card); border: 1px solid var(--navy);">
+          <span class="glyph" style="color: var(--navy);">L</span>
+          <div class="run-label" style="color: var(--navy);">THE LEVERS HOLD</div>
+          <div class="run-hero" style="color: var(--navy);">unchanged</div>
+          <div class="run-hero-sub" style="color: var(--muted);">plan as written</div>
+          <div class="run-body" style="color: var(--muted);">3,500 satellites, 500-satellite first tranche, all segments. W1 can't shrink the constellation — that would be a lever's move.</div>
+        </div>
+        <div class="run-arrow">→</div>
+
+        <!-- R -->
+        <div class="run-stage" style="background: var(--navy); border: 1px solid var(--navy);">
+          <span class="glyph" style="color: var(--amber);">R</span>
+          <div class="run-label" style="color: var(--amber);">THE ENGINE RECOMPUTES</div>
+          <div class="run-hero" style="color: #fff;">+$1.1<span style="font-size:18px;"> B</span></div>
+          <div class="run-hero-sub" style="color: var(--ice);">over the build — no one narrates it</div>
+          <div class="run-body" style="color: var(--ice);">+$400/kg works through the machinery: ~+$0.32M per satellite, and more on every replenishment cycle. Every revenue column slides a year right.</div>
+        </div>
+        <div class="run-arrow">→</div>
+
+        <!-- M -->
+        <div class="run-stage" style="background: var(--card); border: 1px solid var(--good);">
+          <span class="glyph" style="color: var(--good);">M</span>
+          <div class="run-label" style="color: var(--good);">THE VERDICT READS THE METRICS</div>
+          <div class="run-hero" style="color: var(--navy);">IRR 4.8%<span class="die-pill">DIE</span></div>
+          <div class="run-hero-sub" style="color: var(--muted);">vs. the 5% cutoff</div>
+          <div class="run-body" style="color: var(--muted);">The cutoff was fixed before any world ran. Reported as a boundary case — not nudged to either side.</div>
+        </div>
+      </div>
+
+      <div class="punch">
+        One kind of dial moved — <span class="x">X</span>. The plan never flinched — L. The engine did every sum — R. The verdict was <b>read, not argued</b> — M. That is the whole grammar, running once, for real.
+      </div>
+
+      <div class="btn-row">
+        <a class="btn btn-navy" href="#worlds">see W1 run in full — the Worlds tab →</a>
+        <a class="btn btn-paper" href="#schema">see every parameter and its tag — Extract →</a>
+      </div>
+    </section>
+  </div>
+</body>
+</html>

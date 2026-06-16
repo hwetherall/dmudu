@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Overview — Samsung LEO · Deep Uncertainty Workbench</title>
+  <style>
+    :root {
+      --navy: #1A2238;
+      --ink: #232A40;
+      --paper: #F7F9FC;
+      --card: #FFFFFF;
+      --ice: #CADCFC;
+      --amber: #E8A33D;
+      --good: #2E7D5B;
+      --bad: #B23A48;
+      --mid: #8A6D1F;
+      --muted: #5A6478;
+      --line: #D7DEEA;
+      --tint: #E9EEF7;
+      --mono: ui-monospace, Menlo, Consolas, monospace;
+      --serif: Georgia, Cambria, serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .wrap {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 40px 24px 64px;
+    }
+
+    /* App header */
+    .app-head {
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 16px;
+      margin-bottom: 28px;
+    }
+    .app-title {
+      font-family: var(--serif);
+      font-weight: 700;
+      color: var(--navy);
+      font-size: 22px;
+      line-height: 1.2;
+    }
+    .app-sub {
+      font-family: var(--mono);
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 6px;
+    }
+
+    /* Page head */
+    .kicker {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--amber);
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .page-title {
+      font-family: var(--serif);
+      color: var(--navy);
+      font-weight: 700;
+      font-size: 28px;
+      line-height: 1.2;
+    }
+    .page-sub {
+      font-size: 14px;
+      margin-top: 8px;
+      color: var(--muted);
+      max-width: 880px;
+      line-height: 1.55;
+    }
+
+    /* Section card */
+    .section {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      font-weight: 700;
+      margin-bottom: 14px;
+    }
+
+    /* The one idea */
+    .idea-grid {
+      display: grid;
+      grid-template-columns: minmax(280px, 1.1fr) minmax(280px, 1fr);
+      gap: 16px;
+      align-items: center;
+    }
+    .idea-callout {
+      background: var(--navy);
+      color: var(--ice);
+      border-radius: 8px;
+      padding: 18px;
+      font-size: 14px;
+      line-height: 1.75;
+    }
+    .idea-callout b.white { color: #fff; }
+    .idea-callout b.amber { color: var(--amber); }
+
+    /* Levels chart */
+    .levels {
+      display: flex;
+      align-items: flex-end;
+      gap: 4px;
+      min-height: 120px;
+    }
+    .level {
+      flex: 1;
+      min-width: 0;
+      border-radius: 4px;
+      padding: 8px;
+    }
+    .level-label {
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .level-marker {
+      font-family: var(--mono);
+      font-size: 9px;
+      font-weight: 700;
+      background: var(--amber);
+      color: var(--navy);
+      line-height: 1.2;
+      border-radius: 3px;
+      padding: 2px 4px;
+      display: inline-block;
+      margin-top: 4px;
+    }
+    .levels-caption {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 10px;
+    }
+    .levels-caption a {
+      font-family: var(--mono);
+      color: var(--navy);
+      font-weight: 700;
+      text-decoration: underline;
+    }
+
+    /* Card grids */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+    }
+    .nav-card {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      text-align: left;
+    }
+    .nav-card-head {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+    .framing-title {
+      font-family: var(--serif);
+      font-weight: 700;
+      color: var(--navy);
+      font-size: 16px;
+    }
+    .open {
+      margin-left: auto;
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--amber);
+    }
+    .open-muted {
+      margin-left: auto;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .nav-card-sub {
+      font-size: 12px;
+      margin-top: 6px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .pipe-num {
+      font-family: var(--serif);
+      font-weight: 700;
+      color: var(--amber);
+      font-size: 18px;
+    }
+    .pipe-name {
+      font-family: var(--serif);
+      font-weight: 700;
+      color: var(--navy);
+      font-size: 14px;
+    }
+    .pipe-what {
+      font-size: 12px;
+      margin-top: 4px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .note {
+      font-size: 12px;
+      margin-top: 12px;
+      font-style: italic;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    @media (max-width: 720px) {
+      .idea-grid { grid-template-columns: 1fr; }
+    }
+
+    @media print {
+      body { background: #fff; }
+      .wrap { padding: 0; max-width: none; }
+      .section, .nav-card, .idea-callout { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="app-head">
+      <div class="app-title">Samsung LEO · Deep Uncertainty Workbench</div>
+      <div class="app-sub">Innovera · the worked example behind the Pedram pack · every number cited, derived, computed, or declared</div>
+    </header>
+
+    <!-- PageHead -->
+    <div style="margin-bottom: 24px;">
+      <div class="kicker">From better information to deep uncertainty</div>
+      <div class="page-title">A first working attempt at Level 3–4 analysis</div>
+      <div class="page-sub">Worked end-to-end on the Samsung LEO memo — every number on every page of this app traceable back to a cited parameter, a shown derivation, or a declared assumption. The deck tells the story; this is the evidence you can touch.</div>
+    </div>
+
+    <!-- The one idea -->
+    <section class="section">
+      <div class="section-title">The one idea this presentation turns on</div>
+      <div class="idea-grid">
+        <div class="idea-callout">
+          Some uncertainty can be <b class="white">bought down with information</b> — study harder, the error bars shrink. That is level 2, and it is where standard analysis (ours included) lives today.
+          <br /><br />
+          But the questions the Samsung verdict actually turns on — sovereignty politics in 2032, the structure of the launch market — <b class="amber">have no answer yet for any study to find</b>. That is level 3: deep uncertainty. More analysis adds only invented precision.
+          <br /><br />
+          <b class="white">The move this work demonstrates: stop trying to predict the future, and start finding the decision that survives every plausible one.</b>
+        </div>
+        <div>
+          <div class="levels">
+            <div class="level" style="background: var(--tint); border: 1px solid var(--line); height: 60px;">
+              <div class="level-label" style="color: var(--muted);">L1</div>
+            </div>
+            <div class="level" style="background: var(--tint); border: 1px solid var(--line); height: 84px;">
+              <div class="level-label" style="color: var(--muted);">L2</div>
+              <div class="level-marker">Innovera today</div>
+            </div>
+            <div class="level" style="background: var(--navy); border: 1px solid var(--navy); border-left: 4px solid var(--amber); height: 108px;">
+              <div class="level-label" style="color: var(--amber);">L3</div>
+              <div class="level-marker">this workbench</div>
+            </div>
+            <div class="level" style="background: var(--navy); border: 1px solid var(--navy); height: 132px;">
+              <div class="level-label" style="color: var(--amber);">L4</div>
+            </div>
+          </div>
+          <div class="levels-caption">
+            the wall sits between L2 and L3 — <a href="#uncertainty">the Uncertainty tab unpacks it →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- The framing -->
+    <section class="section">
+      <div class="section-title">The framing — three tabs before the pipeline</div>
+      <div class="card-grid">
+        <div class="nav-card">
+          <div class="nav-card-head">
+            <span class="framing-title">Uncertainty</span>
+            <span class="open">open →</span>
+          </div>
+          <div class="nav-card-sub">The four levels, in depth — and the wall between level 2 and level 3 that this whole exercise exists to cross.</div>
+        </div>
+        <div class="nav-card">
+          <div class="nav-card-head">
+            <span class="framing-title">Method</span>
+            <span class="open">open →</span>
+          </div>
+          <div class="nav-card-sub">Seven steps from memo to robust decision: extract, calibrate, worlds, verdicts, strategies, regret, pathway. Each step is a tab here.</div>
+        </div>
+        <div class="nav-card">
+          <div class="nav-card-head">
+            <span class="framing-title">Grammar</span>
+            <span class="open">open →</span>
+          </div>
+          <div class="nav-card-sub">XLRM as a type system: who may move which dial, and why confabulation becomes a type error.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- The pipeline -->
+    <section class="section">
+      <div class="section-title">The pipeline — the method, actually run on the Samsung memo</div>
+      <div class="card-grid">
+        <div class="nav-card">
+          <div class="nav-card-head">
+            <span class="pipe-num">1</span>
+            <span class="pipe-name">Extract</span>
+            <span class="open-muted">open →</span>
+          </div>
+          <div class="pipe-what">memo → cited parameter schema</div>
+        </div>
+        <div class="nav-card">
+          <div class="nav-card-head">
+            <span class="pipe-num">2</span>
+            <span class="pipe-name">Calibrate</span>
+            <span class="open-muted">open →</span>
+          </div>
+          <div class="pipe-what">the memo's own numbers are the test suite</div>
+        </div>
+        <div class="nav-card">
+          <div class="nav-card-head">
+            <span class="pipe-num">3–4</span>
+            <span class="pipe-name">Worlds + Verdicts</span>
+            <span class="open-muted">open →</span>
+          </div>
+          <div class="pipe-what">four futures, verdict rule fixed ex ante</div>
+        </div>
+        <div class="nav-card">
+          <div class="nav-card-head">
+            <span class="pipe-num">5</span>
+            <span class="pipe-name">Strategies</span>
+            <span class="open-muted">open →</span>
+          </div>
+          <div class="pipe-what">five L-configurations, diverse by construction</div>
+        </div>
+        <div class="nav-card">
+          <div class="nav-card-head">
+            <span class="pipe-num">6</span>
+            <span class="pipe-name">Regret</span>
+            <span class="open-muted">open →</span>
+          </div>
+          <div class="pipe-what">5 strategies × 4 worlds, minimax regret</div>
+        </div>
+        <div class="nav-card">
+          <div class="nav-card-head">
+            <span class="pipe-num">7</span>
+            <span class="pipe-name">Pathway</span>
+            <span class="open-muted">open →</span>
+          </div>
+          <div class="pipe-what">signposts, triggers, staged commitment</div>
+        </div>
+        <div class="nav-card">
+          <div class="nav-card-head">
+            <span class="pipe-num">★</span>
+            <span class="pipe-name">Findings</span>
+            <span class="open-muted">open →</span>
+          </div>
+          <div class="pipe-what">what the exercise actually proved</div>
+        </div>
+      </div>
+      <div class="note">The discipline throughout: build the thinking by hand first; automate only after the method is validated. The LLM framed the worlds and proposed parameter shifts; the ~200-line cash engine computed every number on these pages — live, in your browser.</div>
+    </section>
+  </div>
+</body>
+</html>

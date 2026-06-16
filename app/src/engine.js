@@ -33,7 +33,24 @@ export function run(p, deploy, revenueBase, revDelay) {
     const opex = p.eng + (active * p.satOpsK) / 1e6 + p.sga * r;
     const fcf = gross - opex - capex;
     cum += fcf;
-    rows.push({ year: y, sats, active, rev: r, gross, opex, capex, fcf, cum });
+    rows.push({
+      year: y,
+      build,
+      repl,
+      sats,
+      active,
+      rev: r,
+      cogsRate: cogsF,
+      gross,
+      opex,
+      spaceCapex,
+      gatewayCapex: gw,
+      otherCapex: other,
+      capex,
+      fcf,
+      cum,
+      costPerSat,
+    });
   }
   return rows;
 }
